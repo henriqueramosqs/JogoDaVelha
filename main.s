@@ -150,9 +150,23 @@ gameLoop:
 	mv s5,a0		#s5 armazena ascci do digitado
 	li t0,' ' 
 	beq a0,t0,doesntChange
+	beq s6,zero,postPrintPrior
+	
+	jal calculateXCoordinate
+	mv a1, a0
+	
+	jal calculateYCoordinate
+	mv a2,a0
+	
+	la a0,Unmarked
+	jal drawImage
+	
+postPrintPrior:
+	mv a0,s5
 	jal changePosition
 doesntChange:
 	jal checkPosition	# dada a posição, armazena em a0 o itme daquela posição na matriz
+	li s6,0
 	bne a0,zero,gameLoop	# se a posição estiver preenchida, reitera o game loop
 	
 	jal calculateXCoordinate
