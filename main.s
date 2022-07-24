@@ -1,6 +1,5 @@
 
 .data
-
 .include "images_data/Menu.data"
 .include "images_data/UnselectedHardLevel.data"
 .include "images_data/UnselectedMediumLevel.data"
@@ -8,6 +7,10 @@
 .include "images_data/SelectedHardLevel.data"
 .include "images_data/SelectedMediumLevel.data"
 .include "images_data/SelectedEasyLevel.data"
+.include "images_data/Instructions.data"
+.include "images_data/GameBackground.data"
+.include "images_data/TicTacToeStructure.data"
+
 
 matriz: .byte 	0,0,0,
 		0,0,0,
@@ -16,13 +19,12 @@ matriz: .byte 	0,0,0,
 frame_zero: .word 0xFF000000
 frame_one:  .word 0xFF100000
 
-screen_width: .word 320
-screen_height: .word 240
 .text
+	#j startGame #debugging purposes
+	
 	la a0,Menu
 	lw a3, frame_zero
 	jal drawImage
-	
 	
 	la a0,SelectedEasyLevel
 	li  a1,85
@@ -39,8 +41,113 @@ screen_height: .word 240
 	li a2,170
 	jal drawImage
 	
-	li a7,10
+	
+menuLoop:				#s1 armazenará status da seleção
+	jal readKeyBlocking	
+	li t0, 'w'
+	li t1, 's'
+	li t2, ' '
+	li t3, 3
+	beq a0, t0, moveUp
+	beq a0,t1, moveDown
+	j showRules
+moveUp:
+	addi s1,s1,-1
+	j drawMenuOptions
+moveDown:
+	addi s1,s1,1
+drawMenuOptions:
+	rem s1,s1,t3
+	li t0,0
+	li t1,1
+	beq s1,t0,firstMenuOption
+	beq s1,t1,secondMenuOption
+	
+	la a0,UnselectedEasyLevel	# nível difícil selecionado
+	li  a1,85
+	li a2,90
+	jal drawImage
+	
+	la a0,UnselectedMediumLevel
+	li  a1,85
+	li a2,130
+	jal drawImage
+	
+	la a0,SelectedHardLevel
+	li  a1,85
+	li a2,170
+	jal drawImage
+	
+	j menuLoop			# volta para loop do menu
+firstMenuOption:			# nível fácil selecionado
+
+	la a0,SelectedEasyLevel
+	li  a1,85
+	li a2,90
+	jal drawImage
+	
+	la a0,UnselectedMediumLevel
+	li  a1,85
+	li a2,130
+	jal drawImage
+	
+	la a0,UnselectedHardLevel
+	li  a1,85
+	li a2,170
+	jal drawImage
+	j menuLoop		 # volta para loop do menu
+
+secondMenuOption:		# nível médio selcionado
+	la a0,UnselectedEasyLevel
+	li  a1,85
+	li a2,90
+	jal drawImage
+	
+	la a0,SelectedMediumLevel
+	li  a1,85
+	li a2,130
+	jal drawImage
+	
+	la a0,UnselectedHardLevel
+	li  a1,85
+	li a2,170
+	jal drawImage
+	
+	j menuLoop		#volta para loop do menu
+	
+	
+
+showRules:	
+
+	la a0,Instructions
+	li  a1,0
+	li a2,0
+	jal drawImage
+	
+	jal readKeyBlocking
+startGame:
+	li s1,0	 	# s1 maraca pontuação do jogador
+	li s2,0		# s2 marca a pontuação da máquina
+	li s3,0 	# s3 marca a posição do no eixo x do jogador
+	li s4,0		# s4 marca a posição do no eixo y do jogador
+	
+	la a0,GameBackground
+	jal drawImage
+	
+	la a0,TicTacToeStructure
+	li a1,85
+	li a2,67
+	jal drawImage
+	
+gameLoop:
+	jal readKeyBlocking
+	jal changePosition
+	
+	j gameLoop
+	
+	li a7,10	# termina o programa programa
 	ecall
+	
 
 drawImage:	# a0= endereço da imagem, a1= coord_x, a2=coord_y, a3=frame
 
@@ -59,6 +166,7 @@ drawImage:	# a0= endereço da imagem, a1= coord_x, a2=coord_y, a3=frame
 		
 	addi a0,a0,8	# muda a0 para o endereço inicial das cores
 	li t5,0 	# t5 é um marcador de passos à direita
+	li t4, 0xC7
 
 drawLoop:
 	beq t2,t3,finishDraw # se endereço atual = endereço final, finaliza pintura
@@ -69,7 +177,9 @@ drawLoop:
 	add t5,zero,zero
 keepDraw:
 	lb t6,(a0) # t6 carrega coloração do pixel
+	beq t4,t6,transparent
 	sb t6,0(t2)
+transparent:
 	addi t2,t2,1  # muda para póximo endereço
 	addi t5,t5,1  #passa o contador de passos para a direita
 	addi a0,a0,1
@@ -77,4 +187,59 @@ keepDraw:
 finishDraw:
 	ret
 
+
+readKeyBlocking:
+# Pausa o programa e espera que o usu?rio pressione uma tecla para continuar
+#
+# caractere pressiona -> a0
+	
+	li t1, 0xFF200000		# Carrega o endere?o de status do KDMMIO
+rkb_loop:
+	lw t0, 0(t1)		# Carrega o status do teclado
+	andi t0, t0, 0x0001	# Mascara o bit menos significativo. Por qu??!
+	beq t0, zero, rkb_loop	# Se n?o houver tecla pressionada repete at? que o usu?rio aperte algo
+	lw a0, 4(t1)			# Carrega o caractere que foi pressionado
+	sw a0, 12(t1)			# Escreve o caractere lido no display 
+	ret	
+
+readKeyNonBlocking:
+# Verifica se o usu?rio pressionou uma tecla, se não continua o programa, se
+# sim, retorna o caractere pressionado
+#
+# caractere -> a0
+	
+	li t1, 0xFF200000	# Carrega o endereço de status do KDMMIO
+	lw t0, 0(t1)		# Carrega o status do teclado
+	andi t0, t0, 0x0001	# Mascara o bit menos significativo
+	beq t0, zero, rknb_end	# Se não houver tecla pressionada continua
+	lw t2, 4(t1)		# Carrega o caractere que foi pressionado
+	lw a0, 4(t1)		# Carrega em a0 (vari?vel de retorno) o caractere
+	sw t2, 12(t1)		# Escreve o caractere lido no display
+rknb_end:
+	ret
+	
+changePosition:	# :void, recebe em a0 o caracter em ascii que o usuario pressionou
+	li t0,'w'
+	li t1,'a'
+	li t2,'s'
+	li t3,'d'
+	li t4,3
+	beq a0,t0,cursorUp
+	beq a0,t1,cursorLeft
+	beq a0,t2,cursorRight
+	addi s4,s4,1
+	rem s4,s4,t4
+	ret
+cursorUp:
+	addi s4,s4,-1
+	rem s4,s4,t4
+	ret
+cursorLeft:
+	addi s3,s3,-1
+	rem s3,s3,t4
+	ret
+cursorRight:
+	addi s3,s3,1
+	rem s3,s3,t4
+	ret
 	
