@@ -10,7 +10,9 @@
 .include "images_data/Instructions.data"
 .include "images_data/GameBackground.data"
 .include "images_data/TicTacToeStructure.data"
-
+.include "images_data/MarkedSelection.data"
+.include "images_data/Unmarked.data"
+.include "images_data/X.data"
 
 matriz: .byte 	0,0,0,
 		0,0,0,
@@ -120,7 +122,6 @@ secondMenuOption:		# nível médio selcionado
 	
 	j menuLoop		#volta para loop do menu
 	
-	
 
 showRules:	
 
@@ -145,10 +146,35 @@ startGame:
 	jal drawImage
 	
 gameLoop:
-	jal readKeyBlocking
+	jal readKeyBlocking	# Lê entrada do usuário
+	mv s5,a0		#s5 armazena ascci do digitado
+	li t0,' ' 
+	beq a0,t0,doesntChange
 	jal changePosition
+doesntChange:
+	jal checkPosition	# dada a posição, armazena em a0 o itme daquela posição na matriz
+	bne a0,zero,gameLoop	# se a posição estiver preenchida, reitera o game loop
 	
-	j gameLoop
+	jal calculateXCoordinate
+	mv a1, a0
+	
+	jal calculateYCoordinate
+	mv a2,a0
+	
+	li t0,' '
+	bne t0,s5,notPicking
+	jal markPosition
+	la a0,X
+	li s6,0
+	j paintPosition
+notPicking:
+	la a0,MarkedSelection
+	li s6,1	#s6 marca se o item anterior tinha sido destacado
+paintPosition:
+	lw a3,frame_zero
+	jal drawImage
+	j gameLoop  
+	
 	
 	li a7,10	# termina o programa programa
 	ecall
@@ -226,31 +252,60 @@ rknb_end:
 changePosition:	# :void, recebe em a0 o caracter em ascii que o usuario pressionou
 	li t0,'w'
 	li t1,'a'
-	li t2,'s'
-	li t3,'d'
-	li t4,3
+	li t2,'d'
+	li t3,3
 	beq a0,t0,cursorUp
 	beq a0,t1,cursorLeft
 	beq a0,t2,cursorRight
 	addi s4,s4,1
-	rem s4,s4,t4
+	rem s4,s4,t3
 	ret
 cursorUp:
 	addi s4,s4,-1
-	rem s4,s4,t4
+	rem s4,s4,t3
 	bge s4,zero,cursorUpNonNegativeCase
 	addi s4,s4,3
 cursorUpNonNegativeCase:
 	ret
 cursorLeft:
 	addi s3,s3,-1
-	rem s3,s3,t4
+	rem s3,s3,t3
 	bge s3,zero,cursorLeftNonNegativeCase
 	addi s3,s3,3
 cursorLeftNonNegativeCase:
 	ret
 cursorRight:
 	addi s3,s3,1
-	rem s3,s3,t4
+	rem s3,s3,t3
 	ret
 	
+checkPosition:	# s3= pos_x, s4=pos_y, retorna item correspondente à posicao na matriz
+	li t0,3
+	mul t0,t0,s4
+	add t0,t0,s3
+	la t1,matriz
+	add t1,t1,t0
+	lb a0,(t1)	
+	ret
+	
+markPosition:	# s3= pos_x, s4=pos_y, marca item correspondente à posicao na matriz
+	li t0,3
+	mul t0,t0,s4
+	add t0,t0,s3
+	la t1,matriz
+	add t1,t1,t0
+	li t0, 'x'
+	sb t0,(t1)	
+	ret
+	
+calculateXCoordinate:	# s3= pos_x retorna em a0 a coordenada x
+	li t0,51
+	mul a0,t0,s3
+	addi a0,a0,85
+	ret
+
+calculateYCoordinate:	#s4= pos_y retorna em a0 a coordenada y
+	li t0,51
+	mul a0,s4,t0
+	addi a0,a0,67
+	ret
