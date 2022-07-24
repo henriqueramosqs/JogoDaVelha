@@ -19,8 +19,9 @@ matriz: .byte 	0,0,0,
 frame_zero: .word 0xFF000000
 frame_one:  .word 0xFF100000
 
-.text
-	#j startGame #debugging purposes
+.text	
+	lw a3, frame_zero
+	j startGame #debugging purposes
 	
 	la a0,Menu
 	lw a3, frame_zero
@@ -50,9 +51,13 @@ menuLoop:				#s1 armazenará status da seleção
 	li t3, 3
 	beq a0, t0, moveUp
 	beq a0,t1, moveDown
+	bne a0,t2,menuLoop
 	j showRules
 moveUp:
 	addi s1,s1,-1
+	bge s1,zero,nonNegativeCase
+	addi s1,s1,3
+nonNegativeCase:
 	j drawMenuOptions
 moveDown:
 	addi s1,s1,1
@@ -233,10 +238,16 @@ changePosition:	# :void, recebe em a0 o caracter em ascii que o usuario pression
 cursorUp:
 	addi s4,s4,-1
 	rem s4,s4,t4
+	bge s4,zero,cursorUpNonNegativeCase
+	addi s4,s4,3
+cursorUpNonNegativeCase:
 	ret
 cursorLeft:
 	addi s3,s3,-1
 	rem s3,s3,t4
+	bge s3,zero,cursorLeftNonNegativeCase
+	addi s3,s3,3
+cursorLeftNonNegativeCase:
 	ret
 cursorRight:
 	addi s3,s3,1
