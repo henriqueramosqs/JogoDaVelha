@@ -15,8 +15,8 @@
 .include "images_data/X.data"
 
 matriz: .byte 	
-		0,0,'x'
-		0,'x',0,
+		'x',0,'x'
+		'x',0,0,
 		'x',0,0,
 
 		
@@ -346,7 +346,7 @@ calculateYCoordinate:	#s4= pos_y retorna em a0 a coordenada y
 checkWin: #:bool, recebe em a0 o caracter que deve ser analisado
 	addi sp,sp,-8
 	sw a0,(sp)	#prepara pilha para chamada do procedimento
-	sw a0,4(sp)
+	sw ra,4(sp)
 	
 	jal checkLines
 	bne a0,zero,checkWinFinish # se tiver fechado alguma linha,acaba o procedimento
@@ -362,7 +362,7 @@ checkWin: #:bool, recebe em a0 o caracter que deve ser analisado
 	lw a0,(sp)		#pega de volta o caracter que deve ser analisado
 	jal checkSecondaryDiagonal
 checkWinFinish:
-	lw ra,8(sp)	#se tiver ou não fechado, restaura a pilha e retorna o valor de a0
+	lw ra,4(sp)	#se tiver ou não fechado, restaura a pilha e retorna o valor de a0
 	addi sp,sp,8
 	ret
 	
