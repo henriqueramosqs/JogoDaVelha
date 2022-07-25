@@ -16,7 +16,16 @@
 .include "images_data/O.data"
 .include "images_data/VoceVenceu.data"
 .include "images_data/JuliaVenceu.data"
-.include  "images_data/Velha.data"
+.include  "images_data/zero.data"
+.include  "images_data/um.data"
+.include  "images_data/dois.data"
+.include  "images_data/tres.data"
+.include  "images_data/quatro.data"
+.include  "images_data/cinco.data"
+.include  "images_data/seis.data"
+.include  "images_data/sete.data"
+.include  "images_data/oito.data"
+.include  "images_data/nove.data"
 
 matriz: .byte 	
 		0,0,0
@@ -162,7 +171,7 @@ startGame:
 	mv a0,s1
 	ecall
 	
-	#printa placar
+	jal printPlacar
 	
 gameLoop:
 	jal readKeyBlocking	# Lê entrada do usuário
@@ -253,19 +262,19 @@ velha:
 
 userWonInTotal:
 	la a0,VoceVenceu	
-	li a1,0		#ajustar posicao
-	li a2,0
+	li a1,15
+	li a2,57
 	lw a3,frame_zero
 	j endGameMenu
 machineWonInTotal:
 	la a0,JuliaVenceu	
-	li a1,0		#ajustar posicao
-	li a2,0
+	li a1,15	
+	li a2,57
 	lw a3,frame_zero
 	j endGameMenu
 velhaInTotal:
 	la a0,velha
-	li a1,0		
+	li a1,0	
 	li a2,0
 	lw a3,frame_zero
 endGameMenu:
@@ -565,7 +574,118 @@ SecondaryDiagonalLoopEnd:
 	
 resetMatrix:	#:void, zera a matriz
 	la t0,matriz
-	sw zero,(t0)
-	sw zero,4(t0)
-	sb zero 8(t0)
+	sb zero,(t0)
+	sb zero,1(t0)
+	sb zero,2(t0)
+	sb zero,3(t0)
+	sb zero,4(t0)
+	sb zero,5(t0)
+	sb zero,6(t0)
+	sb zero,7(t0)
+	sb zero,8(t0)
+	ret
+	
+printPlacar: # usa s1 como pontuação do jogador, s2 como pontuação da máquina
+	addi sp,sp,-8
+	sw a0,(sp)
+	sw ra,4(sp)	#prepara pilha para chamada dos Draw Images
+	
+	li t0,10	
+	div a0,s1,t0	# a0 = primeiro dígito do usuário
+	
+	jal getNumberImage
+	lw a3, frame_zero
+	li a1, 40
+	li a2,30	
+	jal drawImage		#printa primeiro dígito do usuário
+
+	li t0,10	
+	rem a0,s1,t0	#a0 = segundo dígito do usuário
+	
+	jal getNumberImage
+	lw a3, frame_zero
+	li a1, 55
+	li a2,30	
+	jal drawImage		#printa segunto dígito do usuário
+
+	li t0,10	
+	div a0,s2,t0	# a0 = primeiro dígito da máquina
+	
+	jal getNumberImage
+	lw a3, frame_zero
+	li a1, 250
+	li a2,30	
+	jal drawImage		#printa primeiro dígito da máquina
+
+	li t0,10	
+	rem a0,s1,t0	#a0 = segundo dígito da máquina
+	
+	jal getNumberImage
+	lw a3, frame_zero
+	li a1, 265
+	li a2,30	
+	jal drawImage		#printa segunto dígito da máquina
+	
+	lw a0,(sp)
+	lw ra 4(sp)
+	addi sp,sp,8
+	ret			#restaura pilha
+	
+getNumberImage:		#recebe em a0 o int do numero, retorna o endereco da imagem
+	li t0,0
+	beq a0,a0,ZERO
+	
+	addi t0,t0,1
+	beq a0,t0,Um
+	
+	addi t0,t0,1
+	beq a0,t0,Dois
+	
+	addi t0,t0,1
+	beq a0,t0,Tres
+	
+	addi t0,t0,1
+	beq a0,t0,Quatro
+	
+	addi t0,t0,1
+	beq a0,t0,Cinco
+	
+	addi t0,t0,1
+	beq a0,t0,Seis
+	
+	addi t0,t0,1
+	beq a0,t0,Sete
+	
+	addi t0,t0,1
+	beq a0,t0,Oito
+	
+	la a0, nove
+	ret
+ZERO:
+	la a0,Zero
+	ret
+Um:
+	la a0,um
+	ret
+Dois:
+	la a0,dois
+	ret
+Tres:
+	la a0,tres
+	ret
+	
+Quatro:
+	la a0,quatro
+	ret
+Cinco:
+	la a0,cinco
+	ret
+Seis:
+	la a0,seis
+	ret
+Sete:
+	la a0,sete
+	ret
+Oito:
+	la a0,oito
 	ret
