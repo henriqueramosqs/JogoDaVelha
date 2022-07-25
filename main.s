@@ -23,7 +23,14 @@ frame_one:  .word 0xFF100000
 
 .text	
 	lw a3, frame_zero
-	j startGame #debugging purposes
+	li a0,'x'
+	jal checkWin #debugging purposes
+	add a7,a0,zero	# termina o programa programa
+	li a0,1
+	ecall
+	
+	li a7,10
+	ecall
 	
 	la a0,Menu
 	lw a3, frame_zero
@@ -165,6 +172,8 @@ postPrintPrior:
 	mv a0,s5
 	jal changePosition
 doesntChange:
+	mv a0,s3
+	mv a1,s4
 	jal checkPosition	# dada a posição, armazena em a0 o itme daquela posição na matriz
 	li s6,0
 	bne a0,zero,gameLoop	# se a posição estiver preenchida, reitera o game loop
@@ -187,6 +196,15 @@ notPicking:
 paintPosition:
 	lw a3,frame_zero
 	jal drawImage
+	
+	li a0, 'x' #checa se usuário é vencedor
+	jal checkWin
+	bne a0,zero,goToGameLoop
+	
+	li a0,'o' #checa se a máquina é vencedora
+	jal checkWin
+	bne a0,zero, goToGameLooP
+goToGameLoop:
 	j gameLoop  
 	
 	
@@ -293,10 +311,10 @@ cursorRight:
 	rem s3,s3,t3
 	ret
 	
-checkPosition:	# s3= pos_x, s4=pos_y, retorna item correspondente à posicao na matriz
+checkPosition:	# a0= pos_x, a1=pos_y, retorna item correspondente à posicao na matriz
 	li t0,3
-	mul t0,t0,s4
-	add t0,t0,s3
+	mul t0,t0,a1
+	add t0,t0,a0
 	la t1,matriz
 	add t1,t1,t0
 	lb a0,(t1)	
@@ -322,4 +340,41 @@ calculateYCoordinate:	#s4= pos_y retorna em a0 a coordenada y
 	li t0,51
 	mul a0,s4,t0
 	addi a0,a0,67
+	ret
+	
+checkWin:	# a0 = caracter a ser analisado
+	mv t3,a0
+	li t2,0	# t2 armazena quantidade de caracteres numa linha,coluna ou diagonal
+	li t4,3
+	li a0,0	#pos_x
+	li a1,0	#pos_y
+checkLines:
+	beq a0,t4,outLoop
+	
+	addi sp,sp,-8
+	sw a0,(sp)
+	sw ra,4(sp)
+	
+	jal checkPosition
+	mv t5,a0
+	
+	lw a0,(sp)
+	lw ra,4(sp)
+	addi sp,sp,8
+	
+	bne t3,t5, nextIteration
+	addi t2,t2,1
+	bne t2,t4,nextIteration
+Won:
+	li a0,1
+	ret
+nextIteration:
+	addi a1,a1,1
+	bne a1,t4,goToLoop
+	li a1,0
+	addi a0,a0,1
+	li t1,0
+goToLoop:
+	j checkLines
+outLoop:
 	ret
