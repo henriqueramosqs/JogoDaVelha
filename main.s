@@ -14,9 +14,11 @@
 .include "images_data/Unmarked.data"
 .include "images_data/X.data"
 
-matriz: .byte 	0,0,0,
-		0,0,0,
+matriz: .byte 	
 		0,0,0
+		0,0,0,
+		0,0,0,
+
 		
 frame_zero: .word 0xFF000000
 frame_one:  .word 0xFF100000
@@ -24,9 +26,8 @@ frame_one:  .word 0xFF100000
 .text	
 	lw a3, frame_zero
 	li a0,'x'
-	jal checkWin #debugging purposes
-	add a7,a0,zero	# termina o programa programa
-	li a0,1
+	jal checkLines #debugging purposes
+	addi a7,zero,1	# termina o programa programa
 	ecall
 	
 	li a7,10
@@ -198,12 +199,12 @@ paintPosition:
 	jal drawImage
 	
 	li a0, 'x' #checa se usuário é vencedor
-	jal checkWin
+	jal checkLines
 	bne a0,zero,goToGameLoop
 	
 	li a0,'o' #checa se a máquina é vencedora
-	jal checkWin
-	bne a0,zero, goToGameLooP
+	jal checkLines
+	bne a0,zero, goToGameLoop
 goToGameLoop:
 	j gameLoop  
 	
@@ -342,39 +343,40 @@ calculateYCoordinate:	#s4= pos_y retorna em a0 a coordenada y
 	addi a0,a0,67
 	ret
 	
-checkWin:	# a0 = caracter a ser analisado
-	mv t3,a0
-	li t2,0	# t2 armazena quantidade de caracteres numa linha,coluna ou diagonal
-	li t4,3
-	li a0,0	#pos_x
-	li a1,0	#pos_y
-checkLines:
-	beq a0,t4,outLoop
-	
-	addi sp,sp,-8
+checkLines:	# recebe em a0 o caracter que deve ser checado
+	mv t5,a0	#caracter digitado fica em t5
+	li t2,3	
+	li a0,0 # a0 = pos_x
+	li a1,0 # a1 = pos_y
+checkLinesLoop:
+	li t3,0	# t3 = quantidade de caracteres de certo tipo na linha
+	beq a1,t2, endLinesLoop
+checkLinesInnerLoop:
+
+	addi sp,sp,-8	#prepara pilha para chamado do checkPosition
 	sw a0,(sp)
 	sw ra,4(sp)
 	
-	jal checkPosition
-	mv t5,a0
+	jal checkPosition	
+	mv t4,a0 	#t4 = caracter na posição da matriz
 	
 	lw a0,(sp)
-	lw ra,4(sp)
+	lw ra,4(sp)	#restaura a pilha
 	addi sp,sp,8
 	
-	bne t3,t5, nextIteration
-	addi t2,t2,1
-	bne t2,t4,nextIteration
-Won:
+	bne t5,t4,nextLinesIteration	#se não for igual, passa para próxima iteração
+	addi t3,t3,1	#se der match, aumenta a quantidade do contador
+	bne t3,t2,nextLinesIteration #se t2!=3, vai para próxima iteração
 	li a0,1
-	ret
-nextIteration:
-	addi a1,a1,1
-	bne a1,t4,goToLoop
-	li a1,0
+	ret			#se t2=3, retorna true
+nextLinesIteration:
 	addi a0,a0,1
-	li t1,0
-goToLoop:
-	j checkLines
-outLoop:
+	bne a0,t2,checkLinesInnerLoop
+	li a0,0
+	addi a1,a1,1
+	j checkLinesLoop
+endLinesLoop:
+	li a0,0
 	ret
+	
+	
