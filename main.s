@@ -13,11 +13,15 @@
 .include "images_data/MarkedSelection.data"
 .include "images_data/Unmarked.data"
 .include "images_data/X.data"
+.include "images_data/O.data"
+.include "images_data/VoceVenceu.data"
+.include "images_data/JuliaVenceu.data"
+.include  "images_data/Velha.data"
 
 matriz: .byte 	
-		'x',0,'x'
-		'x',0,0,
-		'x',0,0,
+		0,0,0
+		0,0,0,
+		0,0,0,
 
 		
 frame_zero: .word 0xFF000000
@@ -25,13 +29,7 @@ frame_one:  .word 0xFF100000
 
 .text	
 	lw a3, frame_zero
-	li a0,'x'
-	jal checkWin#debugging purposes
-	addi a7,zero,1	# termina o programa programa
-	ecall
-	
-	li a7,10
-	ecall
+	j startGame
 	
 	la a0,Menu
 	lw a3, frame_zero
@@ -51,7 +49,6 @@ frame_one:  .word 0xFF100000
 	li  a1,85
 	li a2,170
 	jal drawImage
-	
 	
 menuLoop:				#s1 armazenará status da seleção
 	jal readKeyBlocking	
@@ -139,12 +136,20 @@ showRules:
 	jal drawImage
 	
 	jal readKeyBlocking
-startGame:
+	
 	li s1,0	 	# s1 maraca pontuação do jogador
 	li s2,0		# s2 marca a pontuação da máquina
+	li s7,0 	# s7 marca quantidade total de partidas até então
+	li s8,9		# s8 marca quantidade máxima de jogadas
+startGame:
 	li s3,0 	# s3 marca a posição do no eixo x do jogador
 	li s4,0		# s4 marca a posição do no eixo y do jogador
+	li s9,0		# s9 marca contador de jogadas por partida
 	
+	jal resetMatrix
+	
+	li  a1,0
+	li a2,0
 	la a0,GameBackground
 	jal drawImage
 	
@@ -153,9 +158,15 @@ startGame:
 	li a2,67
 	jal drawImage
 	
+	li a7,1
+	mv a0,s1
+	ecall
+	
+	#printa placar
+	
 gameLoop:
 	jal readKeyBlocking	# Lê entrada do usuário
-	mv s5,a0		#s5 armazena ascci do digitado
+	mv s5,a0		# s5 armazena ascci do digitado
 	li t0,' ' 
 	beq a0,t0,doesntChange
 	beq s6,zero,postPrintPrior
@@ -199,18 +210,73 @@ paintPosition:
 	jal drawImage
 	
 	li a0, 'x' #checa se usuário é vencedor
-	jal checkLines
-	bne a0,zero,goToGameLoop
+	jal checkWin
+	bne a0,zero,userWon #se for o caso
 	
-	li a0,'o' #checa se a máquina é vencedora
-	jal checkLines
-	bne a0,zero, goToGameLoop
-goToGameLoop:
-	j gameLoop  
+	addi s9,s9,1
+	beq s9,s8,velha
 	
+	#IA JOGA
 	
-	li a7,10	# termina o programa programa
-	ecall
+	#li a0, 'o' #checa se máquina é vencedor
+	#jal checkWin
+	#bne a0,zero,machineWon
+	#addi s9,s9,1
+	#beq s9,s8,velha
+	
+	j gameLoop
+	
+userWon:
+	addi s1,s1,1 # incrmenta pontuacao do jogador
+	addi s7,s7,1 # incrementa a quantidade de partidas até então
+	
+	li t0,5				#condicionais de contagem
+	beq s1,t0,userWonInTotal
+	li t0,20
+	beq s7,t0,velhaInTotal
+	j startGame  			#começa outro jogo
+machineWon:
+	addi s2,s2,1	#incrementa pontuação da máquina
+	addi s7,s7,1 # incrementa a quantidade de partidas até então
+	
+	li t0,5				#condicionais de contagem
+	beq s2,t0,machineWonInTotal
+	li t0,20
+	beq s7,t0,velhaInTotal
+	j startGame  
+velha:
+	addi s7,s7,1 # incrementa a quantidade de partidas até então
+	li t0,20
+	beq s7,t0,velhaInTotal
+	j startGame  
+  
+
+userWonInTotal:
+	la a0,VoceVenceu	
+	li a1,0		#ajustar posicao
+	li a2,0
+	lw a3,frame_zero
+	j endGameMenu
+machineWonInTotal:
+	la a0,JuliaVenceu	
+	li a1,0		#ajustar posicao
+	li a2,0
+	lw a3,frame_zero
+	j endGameMenu
+velhaInTotal:
+	la a0,velha
+	li a1,0		
+	li a2,0
+	lw a3,frame_zero
+endGameMenu:
+
+	jal drawImage
+
+	#volta para posicao de endgame
+
+	
+li a7,10	# termina o programa programa
+ecall
 	
 
 drawImage:	# a0= endereço da imagem, a1= coord_x, a2=coord_y, a3=frame
@@ -497,3 +563,9 @@ SecondaryDiagonalLoopEnd:
 	li a0,1
 	ret
 	
+resetMatrix:	#:void, zera a matriz
+	la t0,matriz
+	sw zero,(t0)
+	sw zero,4(t0)
+	sb zero 8(t0)
+	ret
