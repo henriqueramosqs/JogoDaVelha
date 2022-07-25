@@ -166,11 +166,7 @@ startGame:
 	li a1,85
 	li a2,67
 	jal drawImage
-	
-	li a7,1
-	mv a0,s1
-	ecall
-	
+
 	jal printPlacar
 	
 gameLoop:
@@ -618,7 +614,7 @@ printPlacar: # usa s1 como pontuação do jogador, s2 como pontuação da máqui
 	jal drawImage		#printa primeiro dígito da máquina
 
 	li t0,10	
-	rem a0,s1,t0	#a0 = segundo dígito da máquina
+	rem a0,s2,t0	#a0 = segundo dígito da máquina
 	
 	jal getNumberImage
 	lw a3, frame_zero
@@ -633,7 +629,7 @@ printPlacar: # usa s1 como pontuação do jogador, s2 como pontuação da máqui
 	
 getNumberImage:		#recebe em a0 o int do numero, retorna o endereco da imagem
 	li t0,0
-	beq a0,a0,ZERO
+	beq a0,t0,ZERO
 	
 	addi t0,t0,1
 	beq a0,t0,Um
