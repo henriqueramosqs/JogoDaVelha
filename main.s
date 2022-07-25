@@ -15,9 +15,9 @@
 .include "images_data/X.data"
 
 matriz: .byte 	
-		0,0,0
-		0,0,0,
-		0,0,0,
+		'x',0,0
+		0,'x',0,
+		0,0,'x',
 
 		
 frame_zero: .word 0xFF000000
@@ -26,7 +26,7 @@ frame_one:  .word 0xFF100000
 .text	
 	lw a3, frame_zero
 	li a0,'x'
-	jal checkColumns #debugging purposes
+	jal checkMainDiagonal #debugging purposes
 	addi a7,zero,1	# termina o programa programa
 	ecall
 	
@@ -416,3 +416,31 @@ endColumnsLoop:
 	li a0,0
 	ret
 	
+	
+checkMainDiagonal:	# recebe em a0 o caracter a ser analisado
+	mv t5,a0	#t5 armazena caracter a ser analisado
+	li t2,3
+	li a0 0
+checkMainDiagonalLoop:
+	addi sp,sp,-8	#prepara pilha para chamado do checkPosition
+	sw a0,(sp)
+	sw ra,4(sp)
+	
+	add a1,a0,zero
+	jal checkPosition	
+	mv t4,a0 	#t4 = caracter na posição da matriz
+	
+	lw a0,(sp)
+	lw ra,4(sp)	#restaura a pilha
+	addi sp,sp,8
+	
+	beq t4,t5,nextMainDiagonalIteration
+	li a0,0
+	ret		#se houver um diferente, return false
+nextMainDiagonalIteration:
+	addi a0,a0,1
+	beq a0,t2,mainDiagonalLoopEnd
+	j checkMainDiagonalLoop
+mainDiagonalLoopEnd:
+	li a0,1
+	ret
