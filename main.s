@@ -26,7 +26,7 @@ frame_one:  .word 0xFF100000
 .text	
 	lw a3, frame_zero
 	li a0,'x'
-	jal checkLines #debugging purposes
+	jal checkColumns #debugging purposes
 	addi a7,zero,1	# termina o programa programa
 	ecall
 	
@@ -379,4 +379,40 @@ endLinesLoop:
 	li a0,0
 	ret
 	
+
+checkColumns:	# recebe em a0 o caracter que deve ser checado
+	mv t5,a0	#caracter digitado fica em t5
+	li t2,3	
+	li a0,0 # a0 = pos_x
+	li a1,0 # a1 = pos_y
+checkColumnsLoop:
+	li t3,0	# t3 = quantidade de caracteres de certo tipo na linha
+	beq a0,t2, endColumnsLoop
+checkColumnsInnerLoop:
+
+	addi sp,sp,-8	#prepara pilha para chamado do checkPosition
+	sw a0,(sp)
+	sw ra,4(sp)
+	
+	jal checkPosition	
+	mv t4,a0 	#t4 = caracter na posição da matriz
+	
+	lw a0,(sp)
+	lw ra,4(sp)	#restaura a pilha
+	addi sp,sp,8
+	
+	bne t5,t4,nextColumnsIteration	#se não for igual, passa para próxima iteração
+	addi t3,t3,1	#se der match, aumenta a quantidade do contador
+	bne t3,t2,nextColumnsIteration #se t2!=3, vai para próxima iteração
+	li a0,1
+	ret			#se t2=3, retorna true
+nextColumnsIteration:
+	addi a1,a1,1
+	bne a1,t2,checkColumnsInnerLoop
+	li a1,0
+	addi a0,a0,1
+	j checkColumnsLoop
+endColumnsLoop:
+	li a0,0
+	ret
 	
