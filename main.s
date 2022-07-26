@@ -16,6 +16,7 @@
 .include "images_data/O.data"
 .include "images_data/VoceVenceu.data"
 .include "images_data/JuliaVenceu.data"
+.include  "images_data/Round.data"
 .include  "images_data/zero.data"
 .include  "images_data/um.data"
 .include  "images_data/dois.data"
@@ -26,6 +27,7 @@
 .include  "images_data/sete.data"
 .include  "images_data/oito.data"
 .include  "images_data/nove.data"
+
 
 matriz: .byte 	
 		0,0,0
@@ -581,7 +583,7 @@ resetMatrix:	#:void, zera a matriz
 	sb zero,8(t0)
 	ret
 	
-printPlacar: # usa s1 como pontuação do jogador, s2 como pontuação da máquina
+printPlacar: # usa s1 como pontuação do jogador, s2 como pontuação da máquina, s7 o nº da partida
 	addi sp,sp,-8
 	sw a0,(sp)
 	sw ra,4(sp)	#prepara pilha para chamada dos Draw Images
@@ -621,6 +623,30 @@ printPlacar: # usa s1 como pontuação do jogador, s2 como pontuação da máqui
 	li a1, 265
 	li a2,30	
 	jal drawImage		#printa segunto dígito da máquina
+	
+	lw a3, frame_zero
+	la a0, Round
+	li a1, 245
+	li a2,170
+	jal drawImage		#printa a palavra round
+
+	div a0,s7,t0	# a0 = primeiro dígito da da quantidade de rounds
+	
+	jal getNumberImage
+	lw a3, frame_zero
+	li a1, 260
+	li a2,192	
+	jal drawImage		#printa primeiro dígito da da quantidade der ounds
+
+	li t0,10	
+	rem a0,s7,t0	#a0 = segundo dígito da máquina
+	
+	jal getNumberImage
+	lw a3, frame_zero
+	li a1, 275
+	li a2, 192	
+	jal drawImage		#printa segunto dígito da máquina	
+
 	
 	lw a0,(sp)
 	lw ra 4(sp)
