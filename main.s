@@ -16,6 +16,7 @@
 .include "images_data/O.data"
 .include "images_data/VoceVenceu.data"
 .include "images_data/JuliaVenceu.data"
+.include "images_data/Velha.data"
 .include "images_data/Round.data"
 .include "images_data/zero.data"
 .include "images_data/um.data"
@@ -32,6 +33,7 @@
 .include "images_data/MenuButtonUnselected.data"
 .include "images_data/RestartButtonSelected.data"
 .include "images_data/RestartButtonUnselected.data"
+.include "images_data/CoverRest.data"
 
 matriz: .byte 	
 		0,0,0
@@ -43,8 +45,9 @@ frame_zero: .word 0xFF000000
 frame_one:  .word 0xFF100000
 
 .text	
+Start:
 	lw a3, frame_zero
-	j startGame
+	j velhaInTotal
 	
 	la a0,Menu
 	lw a3, frame_zero
@@ -287,19 +290,78 @@ machineWonInTotal:
 	lw a3,frame_zero
 	j endGameMenu
 velhaInTotal:
-	la a0,velha
-	li a1,0	
-	li a2,0
+ 	la a0,CoverRest
+ 	li a1,0
+ 	li a2,0
+ 	lw a3,frame_zero
+ 	jal drawImage
+ 	
+	la a0,Velha
+	li a1,39	
+	li a2,8
 	lw a3,frame_zero
 endGameMenu:
-
 	jal drawImage
-
-	#volta para posicao de endgame
-
+	li s1,0 #s1 agora marca opção do jogador
 	
-li a7,10	# termina o programa programa
-ecall
+	j printFirstEndOption
+	
+endGameLoop:				#paridade s1 armazenará status da seleção
+	jal readKeyBlocking	
+	li t0, 'w'
+	li t1, 's'
+	li t2, ' '
+
+	beq a0,t0,addOne
+	beq a0,t1,addOne	# se digitar w ou s, mesmo resultado
+	bne a0,t2, endGameLoop	#se não tiver ditado w,s,ou espaço, não faça nada
+	
+	li t0,2
+	rem t0,s1,t0
+	beq t0,zero,backToMenu	#se tiver na primeira tela, volta pro menu
+	j startGame		#se tiver na segunda, restarta o jogo
+backToMenu:
+	j Start
+	
+
+addOne:
+	addi s1,s1,1
+	
+	li t0,2
+	rem t0,s1,t0
+	beq t0,zero,printFirstEndOption	#printa primeira opcao do menu
+	j printSecondEndOption		#printa segunda opção de menu
+	
+printFirstEndOption:
+	la a0,MenuButtonSelected
+	li a1,85
+	li a2,140
+	lw a3,frame_zero
+	jal drawImage
+	
+	la a0,RestartButtonUnselected
+	li a1,85
+	li a2,186
+	lw a3,frame_zero
+	jal drawImage
+	
+	j endGameLoop
+
+printSecondEndOption:
+	la a0,MenuButtonUnselected
+	li a1,85
+	li a2,140
+	lw a3,frame_zero
+	jal drawImage
+	
+	la a0,RestartButtonSelected
+	li a1,85
+	li a2,186
+	lw a3,frame_zero
+	jal drawImage
+	
+	j endGameLoop
+
 	
 
 drawImage:	# a0= endereço da imagem, a1= coord_x, a2=coord_y, a3=frame
