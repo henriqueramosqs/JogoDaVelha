@@ -16,18 +16,22 @@
 .include "images_data/O.data"
 .include "images_data/VoceVenceu.data"
 .include "images_data/JuliaVenceu.data"
-.include  "images_data/Round.data"
-.include  "images_data/zero.data"
-.include  "images_data/um.data"
-.include  "images_data/dois.data"
-.include  "images_data/tres.data"
-.include  "images_data/quatro.data"
-.include  "images_data/cinco.data"
-.include  "images_data/seis.data"
-.include  "images_data/sete.data"
-.include  "images_data/oito.data"
-.include  "images_data/nove.data"
-
+.include "images_data/Round.data"
+.include "images_data/zero.data"
+.include "images_data/um.data"
+.include "images_data/dois.data"
+.include "images_data/tres.data"
+.include "images_data/quatro.data"
+.include "images_data/cinco.data"
+.include "images_data/seis.data"
+.include "images_data/sete.data"
+.include "images_data/oito.data"
+.include "images_data/nove.data"
+.include "images_data/TicTacToeCover.data"
+.include "images_data/MenuButtonSelected.data"
+.include "images_data/MenuButtonUnselected.data"
+.include "images_data/RestartButtonSelected.data"
+.include "images_data/RestartButtonUnselected.data"
 
 matriz: .byte 	
 		0,0,0
@@ -234,7 +238,7 @@ paintPosition:
 	j gameLoop
 	
 userWon:
-	addi s1,s1,1 # incrmenta pontuacao do jogador
+	addi s1,s1,1 # incrementa pontuacao do jogador
 	addi s7,s7,1 # incrementa a quantidade de partidas até então
 	
 	li t0,5				#condicionais de contagem
@@ -259,12 +263,24 @@ velha:
   
 
 userWonInTotal:
+	
+	lw a3,frame_zero
+	la a0,TicTacToeCover
+	li a1,85
+	li a2,67
+	jal drawImage
+
 	la a0,VoceVenceu	
 	li a1,15
 	li a2,57
-	lw a3,frame_zero
 	j endGameMenu
 machineWonInTotal:
+	lw a3,frame_zero
+	la a0,TicTacToeCover
+	li a1,85
+	li a2,67
+	jal drawImage
+	
 	la a0,JuliaVenceu	
 	li a1,15	
 	li a2,57
