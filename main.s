@@ -378,6 +378,7 @@ drawImage:	# a0= endereço da imagem, a1= coord_x, a2=coord_y, a3=frame
 	mul t3,t3,t1
 	add t3,t3,t0
 	add t3,t3,t2 	# t3 armazena enderço final da área de pintura
+	addi t3,t3,-320
 		
 	addi a0,a0,8	# muda a0 para o endereço inicial das cores
 	li t5,0 	# t5 é um marcador de passos à direita
