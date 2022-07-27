@@ -1,2 +1,2 @@
-CoverRest: .word 320, 120
+CoverRest: .word 320, 240
 .byte
