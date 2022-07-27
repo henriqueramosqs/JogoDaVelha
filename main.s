@@ -692,7 +692,7 @@ printPlacar: # usa s1 como pontuação do jogador, s2 como pontuação da máqui
 	
 	jal getNumberImage
 	lw a3, frame_zero
-	li a1, 250
+	li a1, 255
 	li a2,30	
 	jal drawImage		#printa primeiro dígito da máquina
 
@@ -701,7 +701,7 @@ printPlacar: # usa s1 como pontuação do jogador, s2 como pontuação da máqui
 	
 	jal getNumberImage
 	lw a3, frame_zero
-	li a1, 265
+	li a1, 270
 	li a2,30	
 	jal drawImage		#printa segunto dígito da máquina
 	
