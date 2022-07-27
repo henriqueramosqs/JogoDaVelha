@@ -46,9 +46,8 @@ frame_one:  .word 0xFF100000
 
 .text	
 Start:
-	lw a3, frame_zero
-	j velhaInTotal
-	
+	li a1, 0
+	li a2,0
 	la a0,Menu
 	lw a3, frame_zero
 	jal drawImage
@@ -155,11 +154,12 @@ showRules:
 	
 	jal readKeyBlocking
 	
+startGame:
 	li s1,0	 	# s1 maraca pontuação do jogador
 	li s2,0		# s2 marca a pontuação da máquina
 	li s7,0 	# s7 marca quantidade total de partidas até então
 	li s8,9		# s8 marca quantidade máxima de jogadas
-startGame:
+startRound:
 	li s3,0 	# s3 marca a posição do no eixo x do jogador
 	li s4,0		# s4 marca a posição do no eixo y do jogador
 	li s9,0		# s9 marca contador de jogadas por partida
@@ -216,6 +216,10 @@ doesntChange:
 	la a0,X
 	li s6,0
 	j paintPosition
+	
+	addi s9,s9,1
+	beq s9,s8,velha
+	
 notPicking:
 	la a0,MarkedSelection
 	li s6,1	#s6 marca se o item anterior tinha sido destacado
@@ -227,8 +231,6 @@ paintPosition:
 	jal checkWin
 	bne a0,zero,userWon #se for o caso
 	
-	addi s9,s9,1
-	beq s9,s8,velha
 	
 	#IA JOGA
 	
@@ -248,7 +250,7 @@ userWon:
 	beq s1,t0,userWonInTotal
 	li t0,20
 	beq s7,t0,velhaInTotal
-	j startGame  			#começa outro jogo
+	j startRound  			#começa outro jogo
 machineWon:
 	addi s2,s2,1	#incrementa pontuação da máquina
 	addi s7,s7,1 # incrementa a quantidade de partidas até então
@@ -257,12 +259,12 @@ machineWon:
 	beq s2,t0,machineWonInTotal
 	li t0,20
 	beq s7,t0,velhaInTotal
-	j startGame  
+	j startRound 
 velha:
 	addi s7,s7,1 # incrementa a quantidade de partidas até então
 	li t0,20
 	beq s7,t0,velhaInTotal
-	j startGame  
+	j startRound
   
 
 userWonInTotal:
