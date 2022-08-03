@@ -1,8 +1,7 @@
-.eqv N 32
+.eqv N 1
 
 .data
-Vetor:  .word 9,2,5,1,8,2,4,3,6,7,10,2,32,54,2,12,6,3,1,78,54,23,1,54,2,65,3,6,55,31,4,-4
-
+Vetor:  .word 1
 .text	
 MAIN:	la a0,Vetor
 	li a1,N
