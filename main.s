@@ -37,6 +37,9 @@
 .include "images_data/CoverRest.data"
 
 
+
+
+
 matriz: .byte 	
 		0,0,0
 		0,0,0,
@@ -87,7 +90,6 @@ nonNegativeCase:
 	j drawMenuOptions
 moveDown:
 	addi s1,s1,1
-	addi s10,s10,
 drawMenuOptions:				#s10 armazena o nivel da dificuldade(0 - fácil, 1 - médio, 2 - difícil)
 	rem s1,s1,t3
 	li t0,0
@@ -237,7 +239,6 @@ doesntChange:	#s11 armazena o numero atual da jogada
 	j paintPosition
 	
 	addi s9,s9,1
-	beq s9,s8,velha
 	
 notPicking:
 	la a0,MarkedSelection
@@ -253,6 +254,8 @@ paintPosition:
 	jal checkWin
 	bne a0,zero,userWon #se for o caso
 	
+        beq s9,s8,velha
+	
 	lw a0, 0(sp)
 	addi sp, sp, 4
 	
@@ -266,7 +269,7 @@ paintPosition:
 	jal checkWin
 	bne a0,zero,machineWon
 	addi s9,s9,1
-	beq s9,s8,velha
+	#beq s9,s8,velha # Procedimento maldito favor não mexer ele abre o portal do infernmo
 	
 	j gameLoop
 
@@ -287,6 +290,9 @@ printOsymbol:
 	la a0,O
 	li s6,0
 	j paintPositionForO
+
+
+
 	
 	
 #se der errado, cole aqui abaixo todo o codigo de preventPlayerWin
@@ -308,7 +314,7 @@ machineTurn:
 	li t1, 2
 	beq s11, t1, checkOpeningMovement	#checa qual tipo de abertura foi utilizada pelo player X
 	
-	#jal checkCanIWin		#checa se a IA pode vencer na próxima jogada
+	jal checkCanAIWin		#checa se a IA pode vencer na próxima jogada
 	
 	jal blockPlayerWin
 	
@@ -320,7 +326,707 @@ machineTurn:
 
 retMachineTurn:
 	ret
+
+#################################################################################################################
+#Procedimentos para checar se IA pode vencer na próxima rodada
+#################################################################################################################
+
+checkCanAIWin:
+	addi sp, sp, -4
+	sw ra, 0(sp)
 	
+	mv t0, a6
+	jal checkAIPreviousPosition
+	
+	lw ra, 0(sp)
+	addi sp, sp, 4
+	ret
+
+checkAIPreviousPosition:
+	addi sp, sp, -16
+	sw s1, 0(sp)
+	sw s2, 4(sp)
+	sw s3, 8(sp)
+	sw ra, 12(sp)
+	
+	li s1, 0
+	li s2, 1
+	li s3, 2
+	li t1, 3
+	li t2, 4
+	li t3, 5
+	li t4, 6
+	li t5, 7
+	li t6, 8
+	
+	beq t0, s1, AIposition0
+	beq t0, s2, AIposition1
+	beq t0, s3, AIposition2
+	beq t0, t1, AIposition3
+	beq t0, t2, AIposition4
+	beq t0, t3, AIposition5
+	beq t0, t4, AIposition6
+	beq t0, t5, AIposition7
+	beq t0, t6, AIposition8
+	
+	lw s1, 0(sp)
+	lw s2, 4(sp)
+	lw s3, 8(sp)
+	lw ra, 12(sp)
+	addi sp, sp, 16
+	
+	ret
+
+AIposition0:
+	la t1, matriz
+	jal restoreRegisterValues
+	######################
+	
+	
+	checkWinLinePos0:
+	lb t2, 0(t1)
+	lb t3, 1(t1)
+	lb t4, 2(t1)
+	
+	add t5, t2, t3
+	add t5, t5, t4
+	
+	li t6, 222
+	bne t6, t5, checkWinColummPos0
+	
+	beq t3, zero, inLinePos0InsertPos1
+	beq t4, zero, inLinePos0InsertPos2
+	
+	inLinePos0InsertPos1:
+	li s3, 1
+	li s4, 0
+	jal setOinBoard
+	inLinePos0InsertPos2:
+	li s3, 2
+	li s4, 0
+	jal setOinBoard
+	
+	######################
+	
+	checkWinColummPos0:
+	lb t2, 0(t1)
+	lb t3, 3(t1)
+	lb t4, 6(t1)
+	
+	add t5, t2, t3
+	add t5, t5, t4
+	
+	li t6, 222
+	bne t6, t5, checkWinDiagonalmPos0
+	
+	beq t3, zero, inColummPos0InsertPos3
+	beq t4, zero, inColummPos0InsertPos6
+	
+	inColummPos0InsertPos3:
+	li s3, 0
+	li s4, 1
+	jal setOinBoard
+	inColummPos0InsertPos6:
+	li s3, 0
+	li s4, 2
+	jal setOinBoard
+	
+	######################
+	
+	checkWinDiagonalmPos0:
+	lb t2, 0(t1)
+	lb t3, 4(t1)
+	lb t4, 8(t1)
+	
+	add t5, t2, t3
+	add t5, t5, t4
+	
+	li t6, 222
+	bne t6, t5, returnToMachineTurn
+	
+	beq t3, zero, inDiagonalPos0InsertPos4
+	beq t4, zero, inDiagonalPos0InsertPos8
+	
+	inDiagonalPos0InsertPos4:
+	li s3, 1
+	li s4, 1
+	jal setOinBoard
+	
+	inDiagonalPos0InsertPos8:
+	li s3, 2
+	li s4, 2
+	jal setOinBoard
+	
+
+AIposition4:
+	la t1, matriz
+	jal restoreRegisterValues
+	######################
+	
+	checkWinLinePos4:
+	lb t2, 3(t1)
+	lb t3, 4(t1)
+	lb t4, 5(t1)
+	
+	add t5, t2, t3
+	add t5, t5, t4
+	
+	li t6, 222
+	bne t6, t5, checkWinColummPos4
+	
+	beq t2, zero, inLinePos4InsertPos3
+	beq t4, zero, inLinePos4InsertPos5
+	
+	inLinePos4InsertPos3:
+	li s3, 0
+	li s4, 1
+	jal setOinBoard
+	inLinePos4InsertPos5:
+	li s3, 2
+	li s4, 1
+	jal setOinBoard
+	
+	######################
+	
+	checkWinColummPos4:
+	lb t2, 1(t1)
+	lb t3, 4(t1)
+	lb t4, 7(t1)
+	
+	add t5, t2, t3
+	add t5, t5, t4
+	
+	li t6, 222
+	bne t6, t5, checkWinDiagonalmPrincipalPos4
+	
+	beq t2, zero, inColummPos4InsertPos1
+	beq t4, zero, inColummPos4InsertPos7
+	
+	inColummPos4InsertPos1:
+	li s3, 1
+	li s4, 0
+	jal setOinBoard
+	inColummPos4InsertPos7:
+	li s3, 1
+	li s4, 2
+	jal setOinBoard
+	
+	######################
+	
+	checkWinDiagonalmPrincipalPos4:
+	lb t2, 0(t1)
+	lb t3, 4(t1)
+	lb t4, 8(t1)
+	
+	add t5, t2, t3
+	add t5, t5, t4
+	
+	li t6, 222
+	bne t6, t5, checkWinDiagonalmSecundariaPos4
+	
+	beq t2, zero, inDiagonalPrincipalPos4InsertPos0
+	beq t4, zero, inDiagonalPrincipalPos4InsertPos8
+	
+	inDiagonalPrincipalPos4InsertPos0:
+	li s3, 0
+	li s4, 0
+	jal setOinBoard
+	
+	inDiagonalPrincipalPos4InsertPos8:
+	li s3, 2
+	li s4, 2
+	jal setOinBoard	
+			
+	######################
+			
+	checkWinDiagonalmSecundariaPos4:
+	lb t2, 2(t1)
+	lb t3, 4(t1)
+	lb t4, 6(t1)
+	
+	add t5, t2, t3
+	add t5, t5, t4
+	
+	li t6, 222
+	bne t6, t5, returnToMachineTurn
+	
+	beq t2, zero, inDiagonalSecundariaPos4InsertPos2
+	beq t4, zero, inDiagonalSecundariaPos4InsertPos6
+	
+	inDiagonalSecundariaPos4InsertPos2:
+	li s3, 0
+	li s4, 2
+	jal setOinBoard
+	
+	inDiagonalSecundariaPos4InsertPos6:
+	li s3, 2
+	li s4, 2
+	jal setOinBoard	
+	
+	
+	
+AIposition8:
+	la t1, matriz
+	jal restoreRegisterValues
+	######################
+	
+	checkWinLinePos8:
+	lb t2, 6(t1)
+	lb t3, 7(t1)
+	lb t4, 8(t1)
+	
+	add t5, t2, t3
+	add t5, t5, t4
+	
+	li t6, 222
+	bne t6, t5, checkWinColummPos8
+	
+	beq t2, zero, inLinePos8InsertPos6
+	beq t3, zero, inLinePos8InsertPos7
+	
+	inLinePos8InsertPos6:
+	li s3, 0
+	li s4, 2
+	jal setOinBoard
+	inLinePos8InsertPos7:
+	li s3, 1
+	li s4, 2
+	jal setOinBoard
+	
+	######################
+	
+	checkWinColummPos8:
+	lb t2, 2(t1)
+	lb t3, 5(t1)
+	lb t4, 8(t1)
+	
+	add t5, t2, t3
+	add t5, t5, t4
+	
+	li t6, 222
+	bne t6, t5, checkWinDiagonalmPos8
+	
+	beq t2, zero, inColummPos8InsertPos2
+	beq t3, zero, inColummPos8InsertPos5
+	
+	inColummPos8InsertPos2:
+	li s3, 2
+	li s4, 0
+	jal setOinBoard
+	inColummPos8InsertPos5:
+	li s3, 1
+	li s4, 2
+	jal setOinBoard
+	
+	######################
+	
+	checkWinDiagonalmPos8:
+	lb t2, 0(t1)
+	lb t3, 4(t1)
+	lb t4, 8(t1)
+	
+	add t5, t2, t3
+	add t5, t5, t4
+	
+	li t6, 222
+	bne t6, t5, returnToMachineTurn
+	
+	beq t2, zero, inDiagonalPos8InsertPos0
+	beq t3, zero, inDiagonalPos8InsertPos4
+	
+	inDiagonalPos8InsertPos0:
+	li s3, 0
+	li s4, 0
+	jal setOinBoard
+	
+	inDiagonalPos8InsertPos4:
+	li s3, 1
+	li s4, 1
+	jal setOinBoard
+
+
+AIposition2:
+	la t1, matriz
+	jal restoreRegisterValues
+	######################
+	
+	checkWinLinePos2:
+	lb t2, 2(t1)
+	lb t3, 4(t1)
+	lb t4, 6(t1)
+	
+	add t5, t2, t3
+	add t5, t5, t4
+	
+	li t6, 222
+	bne t6, t5, checkWinColummPos2
+	
+	beq t3, zero, inLinePos2InsertPos4
+	beq t4, zero, inLinePos2InsertPos6
+	
+	inLinePos2InsertPos4:
+	li s3, 1
+	li s4, 1
+	jal setOinBoard
+	inLinePos2InsertPos6:
+	li s3, 0
+	li s4, 2
+	jal setOinBoard
+	
+	######################
+	
+	checkWinColummPos2:
+	lb t2, 2(t1)
+	lb t3, 5(t1)
+	lb t4, 8(t1)
+	
+	add t5, t2, t3
+	add t5, t5, t4
+	
+	li t6, 222
+	bne t6, t5, checkWinDiagonalmPos2
+	
+	beq t3, zero, inColummPos2InsertPos5
+	beq t4, zero, inColummPos2InsertPos8
+	
+	inColummPos2InsertPos5:
+	li s3, 2
+	li s4, 1
+	jal setOinBoard
+	inColummPos2InsertPos8:
+	li s3, 2
+	li s4, 2
+	jal setOinBoard
+	
+	######################
+	
+	checkWinDiagonalmPos2:
+	lb t2, 2(t1)
+	lb t3, 4(t1)
+	lb t4, 6(t1)
+	
+	add t5, t2, t3
+	add t5, t5, t4
+	
+	li t6, 222
+	bne t6, t5, returnToMachineTurn
+	
+	beq t3, zero, inDiagonalPos2InsertPos4
+	beq t4, zero, inDiagonalPos2InsertPos6
+	
+	inDiagonalPos2InsertPos4:
+	li s3, 1
+	li s4, 1
+	jal setOinBoard
+	
+	inDiagonalPos2InsertPos6:
+	li s3, 0
+	li s4, 2
+	jal setOinBoard
+
+
+AIposition6:
+	la t1, matriz
+	jal restoreRegisterValues
+	######################
+	
+	checkWinLinePos6:
+	lb t2, 6(t1)
+	lb t3, 7(t1)
+	lb t4, 8(t1)
+	
+	add t5, t2, t3
+	add t5, t5, t4
+	
+	li t6, 222
+	bne t6, t5, checkWinColummPos6
+	
+	beq t3, zero, inLinePos6InsertPos7
+	beq t4, zero, inLinePos6InsertPos8
+	
+	inLinePos6InsertPos7:
+	li s3, 1
+	li s4, 2
+	jal setOinBoard
+	inLinePos6InsertPos8:
+	li s3, 2
+	li s4, 2
+	jal setOinBoard
+	
+	######################
+	
+	checkWinColummPos6:
+	lb t2, 0(t1)
+	lb t3, 3(t1)
+	lb t4, 6(t1)
+	
+	add t5, t2, t3
+	add t5, t5, t4
+	
+	li t6, 222
+	bne t6, t5, checkWinDiagonalmPos6
+	
+	beq t2, zero, inColummPos6InsertPos0
+	beq t3, zero, inColummPos6InsertPos3
+	
+	inColummPos6InsertPos0:
+	li s3, 0
+	li s4, 0
+	jal setOinBoard
+	inColummPos6InsertPos3:
+	li s3, 0
+	li s4, 1
+	jal setOinBoard
+	
+	######################
+	
+	checkWinDiagonalmPos6:
+	lb t2, 2(t1)
+	lb t3, 4(t1)
+	lb t4, 6(t1)
+	
+	add t5, t2, t3
+	add t5, t5, t4
+	
+	li t6, 222
+	bne t6, t5, returnToMachineTurn
+	
+	beq t2, zero, inDiagonalPos6InsertPos2
+	beq t3, zero, inDiagonalPos6InsertPos4
+	
+	inDiagonalPos6InsertPos2:
+	li s3, 2
+	li s4, 0
+	jal setOinBoard
+	
+	inDiagonalPos6InsertPos4:
+	li s3, 1
+	li s4, 1
+	jal setOinBoard
+
+
+
+AIposition1:
+	la t1, matriz
+	jal restoreRegisterValues
+	######################
+	
+	checkWinLinePos1:
+	lb t2, 0(t1)
+	lb t3, 1(t1)
+	lb t4, 2(t1)
+	
+	add t5, t2, t3
+	add t5, t5, t4
+	
+	li t6, 222
+	bne t6, t5, checkWinColummPos1
+	
+	beq t2, zero, inLinePos1InsertPos0
+	beq t4, zero, inLinePos1InsertPos2
+	
+	inLinePos1InsertPos0:
+	li s3, 0
+	li s4, 0
+	jal setOinBoard
+	inLinePos1InsertPos2:
+	li s3, 2
+	li s4, 0
+	jal setOinBoard
+	
+	######################
+	
+	checkWinColummPos1:
+	lb t2, 1(t1)
+	lb t3, 4(t1)
+	lb t4, 7(t1)
+	
+	add t5, t2, t3
+	add t5, t5, t4
+	
+	li t6, 222
+	bne t6, t5, returnToMachineTurn
+	
+	beq t3, zero, inColummPos1InsertPos4
+	beq t4, zero, inColummPos1InsertPos7
+	
+	inColummPos1InsertPos4:
+	li s3, 0
+	li s4, 1
+	jal setOinBoard
+	inColummPos1InsertPos7:
+	li s3, 1
+	li s4, 2
+	jal setOinBoard
+
+
+AIposition3:
+	la t1, matriz
+	jal restoreRegisterValues
+	######################
+	
+	checkWinLinePos3:
+	lb t2, 3(t1)
+	lb t3, 4(t1)
+	lb t4, 5(t1)
+	
+	add t5, t2, t3
+	add t5, t5, t4
+	
+	li t6, 222
+	bne t6, t5, checkWinColummPos3
+	
+	beq t3, zero, inLinePos3InsertPos4
+	beq t4, zero, inLinePos3InsertPos5
+	
+	inLinePos3InsertPos4:
+	li s3, 1
+	li s4, 1
+	jal setOinBoard
+	inLinePos3InsertPos5:
+	li s3, 2
+	li s4, 1
+	jal setOinBoard
+	
+	######################
+	
+	checkWinColummPos3:
+	lb t2, 0(t1)
+	lb t3, 3(t1)
+	lb t4, 6(t1)
+	
+	add t5, t2, t3
+	add t5, t5, t4
+	
+	li t6, 222
+	bne t6, t5, returnToMachineTurn
+	
+	beq t2, zero, inColummPos3InsertPos0
+	beq t4, zero, inColummPos3InsertPos6
+	
+	inColummPos3InsertPos0:
+	li s3, 0
+	li s4, 0
+	jal setOinBoard
+	inColummPos3InsertPos6:
+	li s3, 0
+	li s4, 2
+	jal setOinBoard
+	
+	
+
+AIposition5:
+	la t1, matriz
+	jal restoreRegisterValues
+	######################
+	
+	checkWinLinePos5:
+	lb t2, 3(t1)
+	lb t3, 4(t1)
+	lb t4, 5(t1)
+	
+	add t5, t2, t3
+	add t5, t5, t4
+	
+	li t6, 222
+	bne t6, t5, checkWinColummPos5
+	
+	beq t2, zero, inLinePos5InsertPos3
+	beq t3, zero, inLinePos5InsertPos4
+	
+	inLinePos5InsertPos3:
+	li s3, 0
+	li s4, 1
+	jal setOinBoard
+	inLinePos5InsertPos4:
+	li s3, 1
+	li s4, 1
+	jal setOinBoard
+	
+	######################
+	
+	checkWinColummPos5:
+	lb t2, 2(t1)
+	lb t3, 5(t1)
+	lb t4, 8(t1)
+	
+	add t5, t2, t3
+	add t5, t5, t4
+	
+	li t6, 222
+	bne t6, t5, returnToMachineTurn
+	
+	beq t2, zero, inColummPos5InsertPos2
+	beq t4, zero, inColummPos5InsertPos8
+	
+	inColummPos5InsertPos2:
+	li s3, 2
+	li s4, 0
+	jal setOinBoard
+	inColummPos5InsertPos8:
+	li s3, 2
+	li s4, 2
+	jal setOinBoard
+	
+	
+
+AIposition7:
+	la t1, matriz
+	jal restoreRegisterValues
+	######################
+	
+	checkWinLinePos7:
+	lb t2, 6(t1)
+	lb t3, 7(t1)
+	lb t4, 8(t1)
+	
+	add t5, t2, t3
+	add t5, t5, t4
+	
+	li t6, 222
+	bne t6, t5, checkWinColummPos7
+	
+	beq t2, zero, inLinePos7InsertPos6
+	beq t4, zero, inLinePos7InsertPos8
+	
+	inLinePos7InsertPos6:
+	li s3, 0
+	li s4, 2
+	jal setOinBoard
+	inLinePos7InsertPos8:
+	li s3, 2
+	li s4, 2
+	jal setOinBoard
+	
+	######################
+	
+	checkWinColummPos7:
+	lb t2, 1(t1)
+	lb t3, 4(t1)
+	lb t4, 7(t1)
+	
+	add t5, t2, t3
+	add t5, t5, t4
+	
+	li t6, 222
+	bne t6, t5, returnToMachineTurn
+	
+	beq t2, zero, inColummPos7InsertPos1
+	beq t3, zero, inColummPos7InsertPos4
+	
+	inColummPos7InsertPos1:
+	li s3, 1
+	li s4, 0
+	jal setOinBoard
+	inColummPos7InsertPos4:
+	li s3, 1
+	li s4, 1
+	jal setOinBoard
+	
+returnToMachineTurn:
+	lw ra, 4(sp)
+	addi sp, sp, 4
+	ret
 #################################################################################################################
 #Começo dos procedimentos para checar se o Player pode vencer na proxima jogada, a IA deverá realizar um bloqueio
 #################################################################################################################
@@ -340,6 +1046,18 @@ blockPlayerWin:
 						#
 						# Checagem da diagonal
 						#
+
+setOinBoard:
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
 
 diagonalPosition0:
 	la t1, matriz
@@ -362,31 +1080,13 @@ diagonalPlotOPos0:
 	li s3, 1
 	li s4, 1
 
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 	
 	InDiagonalPos0insertPosition8:
 	li s3, 2
 	li s4, 2
 	
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 	
 diagonalPosition4:
 	la t1, matriz
@@ -409,31 +1109,13 @@ diagonalPlotOPos4:
 	li s3, 0
 	li s4, 0
 
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 	
 	InDiagonalPos4insertPosition8:
 	li s3, 2
 	li s4, 2
 	
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 	
 diagonalPosition8:
 	la t1, matriz
@@ -456,31 +1138,13 @@ diagonalPlotOPos8:
 	li s3, 0
 	li s4, 0
 
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 	
 	InDiagonalPos8insertPosition4:
 	li s3, 1
 	li s4, 2
 	
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 
 diagonalPosition2:
 	la t1, matriz
@@ -503,31 +1167,13 @@ diagonalPlotOPos2:
 	li s3, 1
 	li s4, 1
 
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 	
 	InDiagonalPos2insertPosition6:
 	li s3, 0
 	li s4, 2
 	
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 	
 	
 diagonalPosition6:
@@ -551,31 +1197,13 @@ diagonalPlotOPos6:
 	li s3, 2
 	li s4, 0
 
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 	
 	InDiagonalPos6insertPosition4:
 	li s3, 1
 	li s4, 1
 	
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 	
 						#
 						# Checagem das colunas
@@ -636,31 +1264,13 @@ colummPlotOPos0:
 	li s3, 0
 	li s4, 1
 
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 	
 	InColummPos0insertPosition6:
 	li s3, 0
 	li s4, 2
 	
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 	
 colummPosition3:
 	la t1, matriz
@@ -683,31 +1293,13 @@ colummPlotOPos3:
 	li s3, 0
 	li s4, 0
 
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 	
 	InColummPos3insertPosition6:
 	li s3, 0
 	li s4, 2
 	
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 
 colummPosition6:
 	la t1, matriz
@@ -724,37 +1316,19 @@ colummPosition6:
 
 colummPlotOPos6:
 	beq t2, zero, InColummPos6insertPosition0
-	beq t4, zero, InColummPos6insertPosition3
+	beq t3, zero, InColummPos6insertPosition3
 	
 	InColummPos6insertPosition0:
 	li s3, 0
 	li s4, 0
 
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 	
 	InColummPos6insertPosition3:
 	li s3, 0
 	li s4, 1
 	
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 
 colummPosition1:
 	la t1, matriz
@@ -777,31 +1351,13 @@ colummPlotOPos1:
 	li s3, 1
 	li s4, 1
 
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 	
 	InColummPos1insertPosition7:
 	li s3, 1
 	li s4, 2
 	
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 
 colummPosition4:
 	la t1, matriz
@@ -824,31 +1380,13 @@ colummPlotOPos4:
 	li s3, 1
 	li s4, 0
 
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 	
 	InColummPos4insertPosition7:
 	li s3, 1
 	li s4, 2
 	
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 
 colummPosition7:
 	la t1, matriz
@@ -871,31 +1409,13 @@ colummPlotOPos7:
 	li s3, 1
 	li s4, 0
 
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 	
 	InColummPos7insertPosition4:
 	li s3, 1
 	li s4, 1
 	
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 	
 colummPosition2:
 	la t1, matriz
@@ -918,31 +1438,13 @@ colummPlotOPos2:
 	li s3, 2
 	li s4, 1
 
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 	
 	InColummPos2insertPosition8:
 	li s3, 2
 	li s4, 2
 	
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 
 colummPosition5:
 	la t1, matriz
@@ -965,31 +1467,13 @@ colummPlotOPos5:
 	li s3, 2
 	li s4, 0
 
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 	
 	InColummPos5insertPosition8:
 	li s3, 2
 	li s4, 2
 	
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 	
 colummPosition8:
 	la t1, matriz
@@ -1006,37 +1490,19 @@ colummPosition8:
 
 colummPlotOPos8:
 	beq t2, zero, InColummPos8insertPosition2
-	beq t4, zero, InColummPos8insertPosition5
+	beq t3, zero, InColummPos8insertPosition5
 	
 	InColummPos8insertPosition2:
 	li s3, 2
 	li s4, 0
 
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 	
 	InColummPos8insertPosition5:
 	li s3, 2
 	li s4, 1
 	
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 						#
 						# Checagem das linhas
 						#
@@ -1097,31 +1563,13 @@ plotOPos0:
 	li s3, 1
 	li s4, 0
 
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 	
 	InPos0insertPosition2:
 	li s3, 2
 	li s4, 0
 	
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 
 linePosition1:
 	la t1, matriz
@@ -1144,31 +1592,13 @@ plotOPos1:
 	li s3, 0
 	li s4, 0
 
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 	
 	InPos1insertPosition2:
 	li s3, 2
 	li s4, 0
 	
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 
 linePosition2:
 	la t1, matriz
@@ -1191,31 +1621,13 @@ plotOPos2:
 	li s3, 0
 	li s4, 0
 
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 	
 	InPos2insertPosition1:
 	li s3, 1
 	li s4, 0
 	
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 
 linePosition3:
 	la t1, matriz
@@ -1238,31 +1650,13 @@ plotOPos3:
 	li s3, 1
 	li s4, 1
 
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 	
 	InPos3insertPosition2:
 	li s3, 2
 	li s4, 1
 	
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 
 linePosition4:
 	la t1, matriz
@@ -1285,31 +1679,13 @@ plotOPos4:
 	li s3, 0
 	li s4, 1
 
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 	
 	InPos4insertPosition2:
 	li s3, 2
 	li s4, 1
 	
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 
 linePosition5:
 	la t1, matriz
@@ -1332,31 +1708,13 @@ plotOPos5:
 	li s3, 0
 	li s4, 1
 
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 	
 	InPos5insertPosition1:
 	li s3, 1
 	li s4, 1
 	
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 
 linePosition6:
 	la t1, matriz
@@ -1379,31 +1737,13 @@ plotOPos6:
 	li s3, 1
 	li s4, 2
 
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 	
 	InPos6insertPosition2:
 	li s3, 2
 	li s4, 2
 	
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 
 linePosition7:
 	la t1, matriz
@@ -1426,31 +1766,13 @@ plotOPos7:
 	li s3, 0
 	li s4, 2
 
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 	
 	InPos7insertPosition2:
 	li s3, 2
 	li s4, 2
 	
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 	
 linePosition8:
 	la t1, matriz
@@ -1473,31 +1795,13 @@ plotOPos8:
 	li s3, 0
 	li s4, 2
 
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 	
 	InPos8insertPosition1:
 	li s3, 1
 	li s4, 2
 	
-	jal calculateXCoordinate
-	mv a1, a0
-	jal calculateYCoordinate
-	mv a2, a0
-	jal markPositionO
-	mv a4, a0
-	#jal restoreRegisterValues
-	
-	jal printOsymbol
-	j gameLoop
+	jal setOinBoard
 
 retToBlockPlayerWin:
 	lw ra, 0(sp)
@@ -1877,6 +2181,7 @@ markPositionO:
 	
 	mv a0, t0	#guarda a posição antiga da bolinha em a0
 	
+	mv a6, t0	
 	li t0, 'o'
 	sb t0,(t1)	
 	
