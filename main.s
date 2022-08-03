@@ -39,7 +39,10 @@
 
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 36c6e28 (preaparing to merge)
 matriz: .byte 	
 		0,0,0
 		0,0,0,
@@ -89,7 +92,11 @@ moveUp:
 nonNegativeCase:
 	j drawMenuOptions
 moveDown:
+<<<<<<< HEAD
 	addi s1,s1,1
+=======
+	addi s10,s10,1
+>>>>>>> 36c6e28 (preaparing to merge)
 drawMenuOptions:				#s10 armazena o nivel da dificuldade(0 - fácil, 1 - médio, 2 - difícil)
 	rem s1,s1,t3
 	li t0,0
@@ -289,9 +296,12 @@ printOsymbol:
 	la a0,O
 	li s6,0
 	j paintPositionForO
+<<<<<<< HEAD
 
 
 
+=======
+>>>>>>> 36c6e28 (preaparing to merge)
 	
 	
 #se der errado, cole aqui abaixo todo o codigo de preventPlayerWin
@@ -313,7 +323,11 @@ machineTurn:
 	li t1, 2
 	beq s11, t1, checkOpeningMovement	#checa qual tipo de abertura foi utilizada pelo player X
 	
+<<<<<<< HEAD
 	jal checkCanAIWin		#checa se a IA pode vencer na próxima jogada
+=======
+	#jal checkCanIWin		#checa se a IA pode vencer na próxima jogada
+>>>>>>> 36c6e28 (preaparing to merge)
 	
 	jal blockPlayerWin
 	
@@ -325,6 +339,7 @@ machineTurn:
 
 retMachineTurn:
 	ret
+<<<<<<< HEAD
 
 #################################################################################################################
 #Procedimentos para checar se IA pode vencer na próxima rodada
@@ -1026,6 +1041,9 @@ returnToMachineTurn:
 	lw ra, 4(sp)
 	addi sp, sp, 4
 	ret
+=======
+	
+>>>>>>> 36c6e28 (preaparing to merge)
 #################################################################################################################
 #Começo dos procedimentos para checar se o Player pode vencer na proxima jogada, a IA deverá realizar um bloqueio
 #################################################################################################################
@@ -1046,6 +1064,7 @@ blockPlayerWin:
 						# Checagem da diagonal
 						#
 
+<<<<<<< HEAD
 setOinBoard:
 	jal calculateXCoordinate
 	mv a1, a0
@@ -1058,6 +1077,8 @@ setOinBoard:
 	jal printOsymbol
 	j gameLoop
 
+=======
+>>>>>>> 36c6e28 (preaparing to merge)
 diagonalPosition0:
 	la t1, matriz
 	lb t2, 0(t1) 
@@ -1079,13 +1100,39 @@ diagonalPlotOPos0:
 	li s3, 1
 	li s4, 1
 
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 	
 	InDiagonalPos0insertPosition8:
 	li s3, 2
 	li s4, 2
 	
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 	
 diagonalPosition4:
 	la t1, matriz
@@ -1108,13 +1155,39 @@ diagonalPlotOPos4:
 	li s3, 0
 	li s4, 0
 
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 	
 	InDiagonalPos4insertPosition8:
 	li s3, 2
 	li s4, 2
 	
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 	
 diagonalPosition8:
 	la t1, matriz
@@ -1137,13 +1210,39 @@ diagonalPlotOPos8:
 	li s3, 0
 	li s4, 0
 
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 	
 	InDiagonalPos8insertPosition4:
 	li s3, 1
 	li s4, 2
 	
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 
 diagonalPosition2:
 	la t1, matriz
@@ -1166,13 +1265,39 @@ diagonalPlotOPos2:
 	li s3, 1
 	li s4, 1
 
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 	
 	InDiagonalPos2insertPosition6:
 	li s3, 0
 	li s4, 2
 	
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 	
 	
 diagonalPosition6:
@@ -1196,13 +1321,39 @@ diagonalPlotOPos6:
 	li s3, 2
 	li s4, 0
 
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 	
 	InDiagonalPos6insertPosition4:
 	li s3, 1
 	li s4, 1
 	
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 	
 						#
 						# Checagem das colunas
@@ -1263,13 +1414,39 @@ colummPlotOPos0:
 	li s3, 0
 	li s4, 1
 
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 	
 	InColummPos0insertPosition6:
 	li s3, 0
 	li s4, 2
 	
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 	
 colummPosition3:
 	la t1, matriz
@@ -1292,13 +1469,39 @@ colummPlotOPos3:
 	li s3, 0
 	li s4, 0
 
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 	
 	InColummPos3insertPosition6:
 	li s3, 0
 	li s4, 2
 	
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 
 colummPosition6:
 	la t1, matriz
@@ -1315,19 +1518,49 @@ colummPosition6:
 
 colummPlotOPos6:
 	beq t2, zero, InColummPos6insertPosition0
+<<<<<<< HEAD
 	beq t3, zero, InColummPos6insertPosition3
+=======
+	beq t4, zero, InColummPos6insertPosition3
+>>>>>>> 36c6e28 (preaparing to merge)
 	
 	InColummPos6insertPosition0:
 	li s3, 0
 	li s4, 0
 
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 	
 	InColummPos6insertPosition3:
 	li s3, 0
 	li s4, 1
 	
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 
 colummPosition1:
 	la t1, matriz
@@ -1350,13 +1583,39 @@ colummPlotOPos1:
 	li s3, 1
 	li s4, 1
 
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 	
 	InColummPos1insertPosition7:
 	li s3, 1
 	li s4, 2
 	
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 
 colummPosition4:
 	la t1, matriz
@@ -1379,13 +1638,39 @@ colummPlotOPos4:
 	li s3, 1
 	li s4, 0
 
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 	
 	InColummPos4insertPosition7:
 	li s3, 1
 	li s4, 2
 	
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 
 colummPosition7:
 	la t1, matriz
@@ -1408,13 +1693,39 @@ colummPlotOPos7:
 	li s3, 1
 	li s4, 0
 
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 	
 	InColummPos7insertPosition4:
 	li s3, 1
 	li s4, 1
 	
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 	
 colummPosition2:
 	la t1, matriz
@@ -1437,13 +1748,39 @@ colummPlotOPos2:
 	li s3, 2
 	li s4, 1
 
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 	
 	InColummPos2insertPosition8:
 	li s3, 2
 	li s4, 2
 	
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 
 colummPosition5:
 	la t1, matriz
@@ -1466,13 +1803,39 @@ colummPlotOPos5:
 	li s3, 2
 	li s4, 0
 
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 	
 	InColummPos5insertPosition8:
 	li s3, 2
 	li s4, 2
 	
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 	
 colummPosition8:
 	la t1, matriz
@@ -1489,19 +1852,49 @@ colummPosition8:
 
 colummPlotOPos8:
 	beq t2, zero, InColummPos8insertPosition2
+<<<<<<< HEAD
 	beq t3, zero, InColummPos8insertPosition5
+=======
+	beq t4, zero, InColummPos8insertPosition5
+>>>>>>> 36c6e28 (preaparing to merge)
 	
 	InColummPos8insertPosition2:
 	li s3, 2
 	li s4, 0
 
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 	
 	InColummPos8insertPosition5:
 	li s3, 2
 	li s4, 1
 	
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 						#
 						# Checagem das linhas
 						#
@@ -1562,13 +1955,39 @@ plotOPos0:
 	li s3, 1
 	li s4, 0
 
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 	
 	InPos0insertPosition2:
 	li s3, 2
 	li s4, 0
 	
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 
 linePosition1:
 	la t1, matriz
@@ -1591,13 +2010,39 @@ plotOPos1:
 	li s3, 0
 	li s4, 0
 
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 	
 	InPos1insertPosition2:
 	li s3, 2
 	li s4, 0
 	
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 
 linePosition2:
 	la t1, matriz
@@ -1620,13 +2065,39 @@ plotOPos2:
 	li s3, 0
 	li s4, 0
 
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 	
 	InPos2insertPosition1:
 	li s3, 1
 	li s4, 0
 	
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 
 linePosition3:
 	la t1, matriz
@@ -1649,13 +2120,39 @@ plotOPos3:
 	li s3, 1
 	li s4, 1
 
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 	
 	InPos3insertPosition2:
 	li s3, 2
 	li s4, 1
 	
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 
 linePosition4:
 	la t1, matriz
@@ -1678,13 +2175,39 @@ plotOPos4:
 	li s3, 0
 	li s4, 1
 
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 	
 	InPos4insertPosition2:
 	li s3, 2
 	li s4, 1
 	
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 
 linePosition5:
 	la t1, matriz
@@ -1707,13 +2230,39 @@ plotOPos5:
 	li s3, 0
 	li s4, 1
 
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 	
 	InPos5insertPosition1:
 	li s3, 1
 	li s4, 1
 	
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 
 linePosition6:
 	la t1, matriz
@@ -1736,13 +2285,39 @@ plotOPos6:
 	li s3, 1
 	li s4, 2
 
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 	
 	InPos6insertPosition2:
 	li s3, 2
 	li s4, 2
 	
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 
 linePosition7:
 	la t1, matriz
@@ -1765,13 +2340,39 @@ plotOPos7:
 	li s3, 0
 	li s4, 2
 
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 	
 	InPos7insertPosition2:
 	li s3, 2
 	li s4, 2
 	
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 	
 linePosition8:
 	la t1, matriz
@@ -1794,13 +2395,39 @@ plotOPos8:
 	li s3, 0
 	li s4, 2
 
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 	
 	InPos8insertPosition1:
 	li s3, 1
 	li s4, 2
 	
+<<<<<<< HEAD
 	jal setOinBoard
+=======
+	jal calculateXCoordinate
+	mv a1, a0
+	jal calculateYCoordinate
+	mv a2, a0
+	jal markPositionO
+	mv a4, a0
+	#jal restoreRegisterValues
+	
+	jal printOsymbol
+	j gameLoop
+>>>>>>> 36c6e28 (preaparing to merge)
 
 retToBlockPlayerWin:
 	lw ra, 0(sp)
@@ -2180,7 +2807,10 @@ markPositionO:
 	
 	mv a0, t0	#guarda a posição antiga da bolinha em a0
 	
+<<<<<<< HEAD
 	mv a6, t0	
+=======
+>>>>>>> 36c6e28 (preaparing to merge)
 	li t0, 'o'
 	sb t0,(t1)	
 	
