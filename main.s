@@ -37,8 +37,6 @@
 .include "images_data/CoverRest.data"
 
 
-
-
 matriz: .byte 	
 		0,0,0
 		0,0,0,
@@ -88,7 +86,8 @@ moveUp:
 nonNegativeCase:
 	j drawMenuOptions
 moveDown:
-	addi s10,s10,1
+	addi s1,s1,1
+	addi s10,s10,
 drawMenuOptions:				#s10 armazena o nivel da dificuldade(0 - fácil, 1 - médio, 2 - difícil)
 	rem s1,s1,t3
 	li t0,0
