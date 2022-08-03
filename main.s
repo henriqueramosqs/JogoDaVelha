@@ -51,6 +51,9 @@ frame_one:  .word 0xFF100000
 
 .text	
 Start:
+	la a0,matriz
+	j EasyPick
+	
 	li a1, 0
 	li a2,0
 	la a0,Menu
@@ -269,7 +272,7 @@ paintPosition:
 	jal checkWin
 	bne a0,zero,machineWon
 	addi s9,s9,1
-	#beq s9,s8,velha # Procedimento maldito favor não mexer ele abre o portal do infernmo
+	#beq s9,s8,velha# Procedimento maldito favor não mexer ele abre o portal do infernmo
 	
 	j gameLoop
 
@@ -2495,3 +2498,32 @@ Sete:
 Oito:
 	la a0,oito
 	ret
+	
+	
+EasyPick:	#procedimento gera a posição aleatória para a matriz em a0
+	jal GetRandomSquare
+	li a7,1
+	ecall
+	beq a0,zero,endEasyPick
+	j EasyPick
+endEasyPick:
+	ret
+	
+	
+	
+GetRandomSquare:	# recebe o endereço da matriz, retorna o conteúdo de um quadrado aleatório
+	mv t2,a0	#t2 guarda o endereço da matriz
+	li a7, 41	#guarda em a0 o numero pseudo aleatório gerad
+	ecall 	
+	
+	
+	li t1, 9
+	remu t0, a0, t1	#gera o número de 0 a 8 correspondente à matriz de posições
+	
+	li t1,4
+	mul t0,t0,t1
+	add a0,t2,t0
+	
+	lw a0,(a0)
+	ret
+	#calcula ao +4t0
