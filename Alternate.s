@@ -8,6 +8,7 @@
 .include "images_data/SelectedHardLevel.data"
 .include "images_data/SelectedMediumLevel.data"
 .include "images_data/SelectedEasyLevel.data"
+.include "images_data/Instructions.data"
 .include "images_data/GameBackground.data"
 .include "images_data/TicTacToeStructure.data"
 .include "images_data/MarkedSelection.data"
@@ -16,6 +17,7 @@
 .include "images_data/O.data"
 .include "images_data/VoceVenceu.data"
 .include "images_data/JuliaVenceu.data"
+.include "images_data/Velha.data"
 .include "images_data/Round.data"
 .include "images_data/zero.data"
 .include "images_data/um.data"
@@ -36,6 +38,8 @@
 
 
 
+
+
 matriz: .byte 	
 		0,0,0
 		0,0,0,
@@ -48,37 +52,39 @@ frame_one:  .word 0xFF100000
 .text	
 Start:
 	la a0,matriz
+	j EasyPick
 	
 	li a1, 0
-	li a2,15
+	li a2,0
 	la a0,Menu
 	lw a3, frame_zero
-	jal auxiliarDrawImage
+	jal drawImage
 	
 	la a0,SelectedEasyLevel
 	li  a1,85
 	li a2,90
-	jal auxiliarDrawImage
+	jal drawImage
 	
 	la a0,UnselectedMediumLevel
 	li  a1,85
 	li a2,130
-	jal auxiliarDrawImage
+	jal drawImage
 	
 	la a0,UnselectedHardLevel
 	li  a1,85
 	li a2,170
-	jal auxiliarDrawImage
+	jal drawImage
 	
 menuLoop:				#s1 armazenará status da seleção
-	jal auxiliarReadKeyBlocking	
+	jal readKeyBlocking	
 	li t0, 'w'
 	li t1, 's'
 	li t2, ' '
 	li t3, 3
 	beq a0, t0, moveUp
 	beq a0,t1, moveDown
-	beq a0,t2,startGame
+	bne a0,t2,menuLoop
+	j showRules
 moveUp:
 	addi s1,s1,-1
 	bge s1,zero,nonNegativeCase
@@ -98,17 +104,17 @@ drawMenuOptions:				#s10 armazena o nivel da dificuldade(0 - fácil, 1 - médio,
 	li s10, 2 
 	li  a1,85
 	li a2,90
-	jal auxiliarDrawImage
+	jal drawImage
 	
 	la a0,UnselectedMediumLevel
 	li  a1,85
 	li a2,130
-	jal auxiliarDrawImage
+	jal drawImage
 	
 	la a0,SelectedHardLevel
 	li  a1,85
 	li a2,170
-	jal auxiliarDrawImage
+	jal drawImage
 	
 	j menuLoop			# volta para loop do menu
 firstMenuOption:			# nível fácil selecionado
@@ -117,17 +123,17 @@ firstMenuOption:			# nível fácil selecionado
 	li s10, 0 
 	li  a1,85
 	li a2,90
-	jal auxiliarDrawImage
+	jal drawImage
 	
 	la a0,UnselectedMediumLevel
 	li  a1,85
 	li a2,130
-	jal auxiliarDrawImage
+	jal drawImage
 	
 	la a0,UnselectedHardLevel
 	li  a1,85
 	li a2,170
-	jal auxiliarDrawImage
+	jal drawImage
 	j menuLoop		 # volta para loop do menu
 
 secondMenuOption:		# nível médio selcionado
@@ -135,26 +141,34 @@ secondMenuOption:		# nível médio selcionado
 	li s10, 1
 	li  a1,85
 	li a2,90
-	jal auxiliarDrawImage
+	jal drawImage
 	
 	la a0,SelectedMediumLevel
 	li  a1,85
 	li a2,130
-	jal auxiliarDrawImage
+	jal drawImage
 	
 	la a0,UnselectedHardLevel
 	li  a1,85
 	li a2,170
-	jal auxiliarDrawImage
+	jal drawImage
 	
 	j menuLoop		#volta para loop do menu
 	
 
+showRules:	
+
+	la a0,Instructions
+	li  a1,0
+	li a2,0
+	jal drawImage
+	
+	jal readKeyBlocking
 	
 startGame:
-	li s1,0	 	# s1 maraca pontuação do jogador
+	li s1,0	 	# s1 marca pontuação do jogador
 	li s2,0		# s2 marca a pontuação da máquina
-	li s7,0 		# s7 marca quantidade total de partidas até então
+	li s7,0 	# s7 marca quantidade total de partidas até então
 	li s8,9		# s8 marca quantidade máxima de jogadas
 startRound:
 	li s3,0 		# s3 marca a posição do no eixo x do jogador
@@ -162,33 +176,32 @@ startRound:
 	li s9,0		# s9 marca contador de jogadas por partida
 	li s11,0		# s11 marca quem é o jogador atual (s11 impar = player, s11 par = IA)
 	
-	jal auxiliarResetMatrix
+	jal resetMatrix
 	
 	li  a1,0
-	li a2,12
+	li a2,0
 	la a0,GameBackground
-	jal auxiliarDrawImage
+	jal drawImage
 	
-	jal readKeyBlocking   #for debugging
 	la a0,TicTacToeStructure
 	li a1,85
 	li a2,67
-	jal auxiliarDrawImage
+	jal drawImage
 
-	jal auxiliarPrintPlacar
+	jal printPlacar
 	
 gameLoop:
-	jal auxiliarReadKeyBlocking	# Lê entrada do usuário
+	jal readKeyBlocking	# Lê entrada do usuário
 	mv s5,a0		# s5 armazena ascci do digitado
 	li t0,' ' 
 	beq a0,t0,doesntChange
 	#li s6, 0 #teste, logo
 	beq s6,zero,postPrintPrior
 	
-	jal auxiliarCalculateXCoordinate
+	jal calculateXCoordinate
 	mv a1, a0
 	
-	jal auxiliarCalculateYCoordinate
+	jal calculateYCoordinate
 	mv a2,a0
 	
 	la a0,Unmarked
@@ -205,10 +218,10 @@ doesntChange:	#s11 armazena o numero atual da jogada
 	li s6,0
 	bne a0,zero,gameLoop	# se a posição estiver preenchida, reitera o game loop
 	
-	jal auxiliarCalculateXCoordinate
+	jal calculateXCoordinate
 	mv a1, a0
 	
-	jal auxiliarCalculateYCoordinate
+	jal calculateYCoordinate
 	mv a2,a0
 	
 	li t0,' '
@@ -238,13 +251,13 @@ paintPosition:
 	sw a0, 0(sp)
 
 	lw a3,frame_zero
-	jal auxiliarDrawImage
+	jal drawImage
 	
 	li a0, 'x' #checa se usuário é vencedor
-	jal auxiliarCheckWin
-	bne a0,zero,auxiliarUserWon #se for o caso
+	jal checkWin
+	bne a0,zero,userWon #se for o caso
 	
-        beq s9,s8,auxiliarVelha
+        beq s9,s8,velha
 	
 	lw a0, 0(sp)
 	addi sp, sp, 4
@@ -256,23 +269,23 @@ paintPosition:
 	jal machineTurn		#descomentar a linha apos o debug
 	
 	li a0, 'o' #checa se máquina é vencedor
-	jal auxiliarCheckWin
-	bne a0,zero, auxiliarMachineWon
+	jal checkWin
+	bne a0,zero,machineWon
 	addi s9,s9,1
-	beq s9,s8,auxiliarVelha# Procedimento maldito favor não mexer ele abre o portal do infernmo
+	#beq s9,s8,velha# Procedimento maldito favor não mexer ele abre o portal do infernmo
 	
 	j gameLoop
 
 paintPositionForO:
 	lw a3,frame_zero
-	jal auxiliarDrawImage
+	jal drawImage
 	
 	checkAIwin:
 	li a0, 'o' #checa se máquina é vencedor
-	jal auxiliarCheckWin
+	jal checkWin
 	bne a0,zero,machineWon
 	addi s9,s9,1
-	beq s9,s8,auxiliarVelha
+	beq s9,s8,velha
 	
 	j gameLoop
 
@@ -302,11 +315,32 @@ machineTurn:
 	addi s11, s11, 1
 	li t0, 1
 	li t1, 2
-	beq s11, t1, checkOpeningMovement	#checa qual tipo de abertura foi utilizada pelo player X
+	#beq s11, t1, checkOpeningMovement	#checa qual tipo de abertura foi utilizada pelo player X
 	
-	jal checkCanAIWin		#checa se a IA pode vencer na próxima jogada
+	#jal checkCanAIWin		#checa se a IA pode vencer na próxima jogada
 	
-	jal blockPlayerWin
+	#jal blockPlayerWin
+	jal EasyPick
+	
+	addi sp,sp,-8
+	sw s3,0(sp)
+	sw s4,4(sp)
+	
+	mv s3,a0
+	mv s4,a1
+	jal calculateXCoordinate
+	mv a1, a0
+	
+	jal calculateYCoordinate
+	mv a2,a0
+	
+	la a0,O
+	lw a3,frame_zero
+	
+	lw s3, 0(sp)
+	lw s4, 4(sp)
+	addi sp, sp, 8
+	
 	
 	lw a0, 0(sp)
 	lw ra, 4(sp)
@@ -321,211 +355,6 @@ retMachineTurn:
 #Procedimentos para checar se IA pode vencer na próxima rodada
 #################################################################################################################
 
-checkCanAIWin:
-	addi sp, sp, -4
-	sw ra, 0(sp)
-	
-	mv t0, a6
-	jal checkAIPreviousPosition
-	
-	lw ra, 0(sp)
-	addi sp, sp, 4
-	ret
-
-checkAIPreviousPosition:
-	addi sp, sp, -16
-	sw s1, 0(sp)
-	sw s2, 4(sp)
-	sw s3, 8(sp)
-	sw ra, 12(sp)
-	
-	li s1, 0
-	li s2, 1
-	li s3, 2
-	li t1, 3
-	li t2, 4
-	li t3, 5
-	li t4, 6
-	li t5, 7
-	li t6, 8
-	
-	beq t0, s1, AIposition0
-	beq t0, s2, AIposition1
-	beq t0, s3, AIposition2
-	beq t0, t1, AIposition3
-	beq t0, t2, AIposition4
-	beq t0, t3, AIposition5
-	beq t0, t4, AIposition6
-	beq t0, t5, AIposition7
-	beq t0, t6, AIposition8
-	
-	lw s1, 0(sp)
-	lw s2, 4(sp)
-	lw s3, 8(sp)
-	lw ra, 12(sp)
-	addi sp, sp, 16
-	
-	ret
-
-AIposition0:
-	la t1, matriz
-	jal restoreRegisterValues
-	######################
-	
-	
-	checkWinLinePos0:
-	lb t2, 0(t1)
-	lb t3, 1(t1)
-	lb t4, 2(t1)
-	
-	add t5, t2, t3
-	add t5, t5, t4
-	
-	li t6, 222
-	bne t6, t5, checkWinColummPos0
-	
-	beq t3, zero, inLinePos0InsertPos1
-	beq t4, zero, inLinePos0InsertPos2
-	
-	inLinePos0InsertPos1:
-	li s3, 1
-	li s4, 0
-	jal setOinBoard
-	inLinePos0InsertPos2:
-	li s3, 2
-	li s4, 0
-	jal setOinBoard
-	
-	######################
-	
-	checkWinColummPos0:
-	lb t2, 0(t1)
-	lb t3, 3(t1)
-	lb t4, 6(t1)
-	
-	add t5, t2, t3
-	add t5, t5, t4
-	
-	li t6, 222
-	bne t6, t5, checkWinDiagonalmPos0
-	
-	beq t3, zero, inColummPos0InsertPos3
-	beq t4, zero, inColummPos0InsertPos6
-	
-	inColummPos0InsertPos3:
-	li s3, 0
-	li s4, 1
-	jal setOinBoard
-	inColummPos0InsertPos6:
-	li s3, 0
-	li s4, 2
-	jal setOinBoard
-	
-	######################
-	
-	checkWinDiagonalmPos0:
-	lb t2, 0(t1)
-	lb t3, 4(t1)
-	lb t4, 8(t1)
-	
-	add t5, t2, t3
-	add t5, t5, t4
-	
-	li t6, 222
-	bne t6, t5, returnToMachineTurn
-	
-	beq t3, zero, inDiagonalPos0InsertPos4
-	beq t4, zero, inDiagonalPos0InsertPos8
-	
-	inDiagonalPos0InsertPos4:
-	li s3, 1
-	li s4, 1
-	jal setOinBoard
-	
-	inDiagonalPos0InsertPos8:
-	li s3, 2
-	li s4, 2
-	jal setOinBoard
-	
-
-AIposition4:
-	la t1, matriz
-	jal restoreRegisterValues
-	######################
-	
-	checkWinLinePos4:
-	lb t2, 3(t1)
-	lb t3, 4(t1)
-	lb t4, 5(t1)
-	
-	add t5, t2, t3
-	add t5, t5, t4
-	
-	li t6, 222
-	bne t6, t5, checkWinColummPos4
-	
-	beq t2, zero, inLinePos4InsertPos3
-	beq t4, zero, inLinePos4InsertPos5
-	
-	inLinePos4InsertPos3:
-	li s3, 0
-	li s4, 1
-	jal setOinBoard
-	inLinePos4InsertPos5:
-	li s3, 2
-	li s4, 1
-	jal setOinBoard
-	
-	######################
-	
-	checkWinColummPos4:
-	lb t2, 1(t1)
-	lb t3, 4(t1)
-	lb t4, 7(t1)
-	
-	add t5, t2, t3
-	add t5, t5, t4
-	
-	li t6, 222
-	bne t6, t5, checkWinDiagonalmPrincipalPos4
-	
-	beq t2, zero, inColummPos4InsertPos1
-	beq t4, zero, inColummPos4InsertPos7
-	
-	inColummPos4InsertPos1:
-	li s3, 1
-	li s4, 0
-	jal setOinBoard
-	inColummPos4InsertPos7:
-	li s3, 1
-	li s4, 2
-	jal setOinBoard
-	
-	######################
-	
-	checkWinDiagonalmPrincipalPos4:
-	lb t2, 0(t1)
-	lb t3, 4(t1)
-	lb t4, 8(t1)
-	
-	add t5, t2, t3
-	add t5, t5, t4
-	
-	li t6, 222
-	bne t6, t5, checkWinDiagonalmSecundariaPos4
-	
-	beq t2, zero, inDiagonalPrincipalPos4InsertPos0
-	beq t4, zero, inDiagonalPrincipalPos4InsertPos8
-	
-	inDiagonalPrincipalPos4InsertPos0:
-	li s3, 0
-	li s4, 0
-	jal setOinBoard
-	
-	inDiagonalPrincipalPos4InsertPos8:
-	li s3, 2
-	li s4, 2
-	jal setOinBoard	
 			
 	######################
 			
@@ -1017,39 +846,6 @@ returnToMachineTurn:
 	lw ra, 4(sp)
 	addi sp, sp, 4
 	ret
-
-# A fim de evitar que os saltos não alcancem suas respectivas labels, esses campos servem como
-# ponte para alcançar as labels.
-
-auxiliarUserWon:
-	j userWon
-	
-auxiliarCheckWin:
-	j checkWin
-			
-auxiliarVelha:
-	j velha	
-	
-auxiliarDrawImage:
-	j drawImage
-	
-auxiliarPrintPlacar:
-	j printPlacar
-	
-auxiliarReadKeyBlocking:
-	j readKeyBlocking
-	
-auxiliarResetMatrix:
-	j resetMatrix
-	
-auxiliarCalculateXCoordinate:
-	j calculateXCoordinate
-
-auxiliarCalculateYCoordinate:
-	j calculateYCoordinate
-
-auxiliarMachineWon:
-	j machineWon
 #################################################################################################################
 #Começo dos procedimentos para checar se o Player pode vencer na proxima jogada, a IA deverá realizar um bloqueio
 #################################################################################################################
@@ -1071,9 +867,9 @@ blockPlayerWin:
 						#
 
 setOinBoard:
-	jal auxiliarCalculateXCoordinate
+	jal calculateXCoordinate
 	mv a1, a0
-	jal auxiliarCalculateYCoordinate
+	jal calculateYCoordinate
 	mv a2, a0
 	jal markPositionO
 	mv a4, a0
@@ -1227,7 +1023,7 @@ diagonalPlotOPos6:
 	li s4, 1
 	
 	jal setOinBoard
-
+	
 						#
 						# Checagem das colunas
 						#
@@ -1899,10 +1695,10 @@ plotInTheCorner:
 	li s3, 0
 	li s4, 0
 	
-	jal auxiliarCalculateXCoordinate
+	jal calculateXCoordinate
 	mv a1, a0
 	
-	jal auxiliarCalculateYCoordinate
+	jal calculateYCoordinate
 	mv a2, a0
 	
 	jal markPositionO
@@ -1922,10 +1718,10 @@ plotInTheCenter:
 	li s3, 1
 	li s4, 1
 	
-	jal auxiliarCalculateXCoordinate
+	jal calculateXCoordinate
 	mv a1, a0
 	
-	jal auxiliarCalculateYCoordinate
+	jal calculateYCoordinate
 	mv a2, a0
 	
 	jal markPositionO
@@ -1997,7 +1793,10 @@ velhaInTotal:
  	lw a3,frame_zero
  	jal drawImage
  	
-	#colocar velha aqui
+	la a0,Velha
+	li a1,39	
+	li a2,8
+	lw a3,frame_zero
 endGameMenu:
 	jal drawImage
 	li s1,0 #s1 agora marca opção do jogador
@@ -2517,15 +2316,24 @@ Oito:
 	ret
 	
 	
-EasyPick:	#procedimento gera a posição aleatória para a matriz em a0
+EasyPick:	# procedimento gera a posição aleatória para a matriz em a0
 	jal GetRandomSquare
 	li a7,1
 	ecall
-	beq a0,zero,endEasyPick
+	beq a1,zero,endEasyPick
 	j EasyPick
 endEasyPick:
-	ret
+	li t4,'o'
+	sw t4,(a0)
+	sub a0,a0,t2 #calcula 4*posicao
+	li t1,4
+	div a0,a0,t1 #a0 = posicao
+	mv t2,a0
+	li t1,3
+	rem a0,a0,t1	#a0 = coord_x
+	div a1,t2,t1   #a1 = coord_y
 	
+	ret
 	
 	
 GetRandomSquare:	# recebe o endereço da matriz, retorna o conteúdo de um quadrado aleatório
@@ -2541,6 +2349,6 @@ GetRandomSquare:	# recebe o endereço da matriz, retorna o conteúdo de um quadr
 	mul t0,t0,t1
 	add a0,t2,t0
 	
-	lw a0,(a0)
-	ret
+	lb a1,(a0)
+	ret			#a0 = endereco, a1= conteudo
 	#calcula ao +4t0
