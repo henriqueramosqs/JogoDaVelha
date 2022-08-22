@@ -159,7 +159,7 @@ startRound:
 	li s3,0 		# s3 marca a posição do no eixo x do jogador
 	li s4,0		# s4 marca a posição do no eixo y do jogador
 	li s9,0		# s9 marca contador de jogadas por partida
-	li s11,0		# s11 marca quem é o jogador atual (s11 impar = player, s11 par = IA)
+	li s11,0		# s11 marca quem é o jogador atual (s11 par = player, s11 impar = IA)
 	
 	jal auxiliarResetMatrix
 	
@@ -2233,7 +2233,7 @@ markPositionO:
 	
 	mv a0, t0	#guarda a posição antiga da bolinha em a0
 	
-	mv a6, t0	#comentado para que a6 = nível
+	#mv a6, t0	#comentado para que a6 = nível
 	li t0, 'o'
 	sb t0,(t1)	
 	
@@ -2554,9 +2554,7 @@ EasyPick:	# procedimento gera a posição aleatória para a matriz em a0
 	beq a1,zero,endEasyPick
 	j EasyPick
 endEasyPick:
-	sub a0,a0,t2 #calcula 4*posicao
-	li t1,4
-	div a0,a0,t1 #a0 = posicao
+	sub a0,a0,t2 #calcula posicao
 	mv t2,a0
 	li t1,3
 	rem a0,a0,t1	#a0 = coord_x
@@ -2579,6 +2577,8 @@ endEasyPick:
 	lw s4 4(sp)
 	addi sp,sp,4
 	
+	addi s11,s11,1
+	
 	jal printOsymbol # pinta a boilinha
 	
 	ret
@@ -2588,7 +2588,6 @@ GetRandomSquare:	# recebe o endereço da matriz, retorna o conteúdo de um quadr
 	li a7, 41	#guarda em a0 o numero pseudo aleatório gerad
 	ecall 	
 	
-	
 	li t1, 9
 	remu t0, a0, t1	#gera o número de 0 a 8 correspondente à matriz de posições
 
@@ -2597,4 +2596,3 @@ GetRandomSquare:	# recebe o endereço da matriz, retorna o conteúdo de um quadr
 	lb a1,(a0)
 	ret			#a0 = endereco, a1= conteudo
 	#calcula ao +4t0
-
