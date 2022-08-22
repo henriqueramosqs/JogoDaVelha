@@ -165,7 +165,7 @@ startRound:
 	jal auxiliarResetMatrix
 	
 	li  a1,0
-	li a2,12
+	li a2,10
 	la a0,GameBackground
 	jal auxiliarDrawImage
 	
