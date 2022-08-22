@@ -48,7 +48,7 @@ frame_one:  .word 0xFF100000
 .text	
 Start:
 	la a0,matriz
-	
+		
 	li a1, 0
 	li a2,15
 	la a0,Menu
@@ -164,12 +164,24 @@ startRound:
 	
 	jal auxiliarResetMatrix
 	
+	li t0,0 
+	li t1,3920
+	lw t2,frame_zero	#endereço base da frame
+	li t3,0
+	
+MenuCoverLoop:
+	beq t0,t1,endMenuCover  #se escever a quantidade de words suficientes, finaliza o loopp
+	slli t4,t0,2		#t4 = 4* indice_da_word
+	add t4,t4,t2		#t4 = endereço_base_da_frame + 4* indice_da_word
+	sw t3, (t4)		
+	addi t0,t0,1
+	j MenuCoverLoop
+endMenuCover:
 	li  a1,0
 	li a2,10
 	la a0,GameBackground
 	jal auxiliarDrawImage
 	
-	jal readKeyBlocking   #for debugging
 	la a0,TicTacToeStructure
 	li a1,85
 	li a2,67
@@ -2016,6 +2028,20 @@ endGameLoop:				#paridade s1 armazenará status da seleção
 	
 	li t0,2
 	rem t0,s1,t0
+	
+	li t5,0 
+	li t1,19200
+	lw t2,frame_zero	#endereço base da frame
+	li t3,0
+	
+endCoverLoop:
+	beq t5,t1,endEndCover  #se escever a quantidade de words suficientes, finaliza o loopp
+	slli t4,t5,2		#t4 = 4* indice_da_word
+	add t4,t4,t2		#t4 = endereço_base_da_frame + 4* indice_da_word
+	sw t3, (t4)		
+	addi t5,t5,1
+	j endCoverLoop
+endEndCover:
 	beq t0,zero,backToMenu	#se tiver na primeira tela, volta pro menu
 	j startGame		#se tiver na segunda, restarta o jogo
 backToMenu:
