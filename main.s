@@ -40,7 +40,6 @@ matriz: .byte
 		0,0,0
 		0,0,0,
 		0,0,0,
-
 		
 frame_zero: .word 0xFF000000
 frame_one:  .word 0xFF100000
@@ -265,7 +264,14 @@ paintPosition:
 	
 	beq t0, a4, checkAIwin
 	
-	jal machineTurn		#descomentar a linha apos o debug
+	addi sp,sp,-4
+	sw a0,0(sp)
+	la a0,matriz
+	
+	jal machineTurn
+	
+	lw a0,0(sp)
+	addi sp,sp,4
 	
 	li a0, 'o' #checa se máquina é vencedor
 	jal auxiliarCheckWin
@@ -279,7 +285,7 @@ paintPositionForO:
 	lw a3,frame_zero
 	jal auxiliarDrawImage
 	
-	checkAIwin:
+checkAIwin:
 	li a0, 'o' #checa se máquina é vencedor
 	jal auxiliarCheckWin
 	bne a0,zero,machineWon
@@ -295,21 +301,19 @@ printOsymbol:
 
 
 
-	
-	
+
 #se der errado, cole aqui abaixo todo o codigo de preventPlayerWin
-	
 machineTurn:
 	li t0, 2
 	rem t0, s11, t0
 	beq t0, zero, gameLoop
 	
+	beq a6,zero,AuxiliarEasyPick
+	
 	addi sp, sp, -8
 	sw a0, 0(sp)
 	sw ra, 4(sp)
 	
-	# lb t0, (t1)
-	#bne t0, t2, nextIterationLabel	
 	
 	addi s11, s11, 1
 	li t0, 1
@@ -337,7 +341,7 @@ checkCanAIWin:
 	addi sp, sp, -4
 	sw ra, 0(sp)
 	
-	mv t0, a6
+	#mv t0, a6 #comentado para que a6=nível
 	jal checkAIPreviousPosition
 	
 	lw ra, 0(sp)
@@ -1062,6 +1066,8 @@ auxiliarCalculateYCoordinate:
 
 auxiliarMachineWon:
 	j machineWon
+AuxiliarEasyPick:
+	j EasyPick
 #################################################################################################################
 #Começo dos procedimentos para checar se o Player pode vencer na proxima jogada, a IA deverá realizar um bloqueio
 #################################################################################################################
@@ -2227,7 +2233,7 @@ markPositionO:
 	
 	mv a0, t0	#guarda a posição antiga da bolinha em a0
 	
-	mv a6, t0	
+	mv a6, t0	#comentado para que a6 = nível
 	li t0, 'o'
 	sb t0,(t1)	
 	
@@ -2542,17 +2548,40 @@ Oito:
 	la a0,oito
 	ret
 	
-	
-EasyPick:	#procedimento gera a posição aleatória para a matriz em a0
+EasyPick:	# procedimento gera a posição aleatória para a matriz em a0
+	la a0,matriz
 	jal GetRandomSquare
-	li a7,1
-	ecall
-	beq a0,zero,endEasyPick
+	beq a1,zero,endEasyPick
 	j EasyPick
 endEasyPick:
+	sub a0,a0,t2 #calcula 4*posicao
+	li t1,4
+	div a0,a0,t1 #a0 = posicao
+	mv t2,a0
+	li t1,3
+	rem a0,a0,t1	#a0 = coord_x
+	div a1,t2,t1   #a1 = coord_y
+	
+	addi sp,sp,-8
+	sw s3,0(sp)
+	sw s4,4(sp)
+	
+	mv s3,a0
+	mv s4,a1
+	
+	jal auxiliarCalculateXCoordinate
+	mv a1, a0
+	jal auxiliarCalculateYCoordinate
+	mv a2, a0
+	jal markPositionO #preenche a posição da matriz,
+	
+	lw s3,0(sp)
+	lw s4 4(sp)
+	addi sp,sp,4
+	
+	jal printOsymbol # pinta a boilinha
+	
 	ret
-	
-	
 	
 GetRandomSquare:	# recebe o endereço da matriz, retorna o conteúdo de um quadrado aleatório
 	mv t2,a0	#t2 guarda o endereço da matriz
@@ -2562,11 +2591,10 @@ GetRandomSquare:	# recebe o endereço da matriz, retorna o conteúdo de um quadr
 	
 	li t1, 9
 	remu t0, a0, t1	#gera o número de 0 a 8 correspondente à matriz de posições
-	
-	li t1,4
-	mul t0,t0,t1
+
 	add a0,t2,t0
 	
-	lw a0,(a0)
-	ret
+	lb a1,(a0)
+	ret			#a0 = endereco, a1= conteudo
 	#calcula ao +4t0
+
