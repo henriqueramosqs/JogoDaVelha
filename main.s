@@ -154,7 +154,7 @@ secondMenuOption:		# nível médio selcionado
 startGame:
 	li s1,0	 	# s1 maraca pontuação do jogador
 	li s2,0		# s2 marca a pontuação da máquina
-	li s7,0 		# s7 marca quantidade total de partidas até então
+	li s7,0 	# s7 marca quantidade total de partidas até então
 	li s8,9		# s8 marca quantidade máxima de jogadas
 startRound:
 	li s3,0 		# s3 marca a posição do no eixo x do jogador
@@ -256,7 +256,7 @@ paintPosition:
 	jal auxiliarCheckWin
 	bne a0,zero,auxiliarUserWon #se for o caso
 	
-        beq s9,s8,auxiliarVelha
+        beq s11,s8,auxiliarVelha #Tentatica de consertar o velha
 	
 	lw a0, 0(sp)
 	addi sp, sp, 4
