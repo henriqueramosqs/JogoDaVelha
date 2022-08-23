@@ -77,6 +77,7 @@ menuLoop:				#s1 armazenará status da seleção
 	li t3, 3
 	beq a0, t0, moveUp
 	beq a0,t1, moveDown
+	mv a6,s1
 	beq a0,t2,startGame
 moveUp:
 	addi s1,s1,-1
@@ -269,7 +270,7 @@ paintPosition:
 	la a0,matriz
 	
 	jal machineTurn
-	
+AfterMachineTurn:	
 	lw a0,0(sp)
 	addi sp,sp,4
 	
@@ -277,7 +278,7 @@ paintPosition:
 	jal auxiliarCheckWin
 	bne a0,zero, auxiliarMachineWon
 	addi s9,s9,1
-	beq s9,s8,auxiliarVelha# Procedimento maldito favor não mexer ele abre o portal do infernmo
+	beq s11,s8,auxiliarVelha 	#Tentativa de troca
 	
 	j gameLoop
 
@@ -308,12 +309,21 @@ machineTurn:
 	rem t0, s11, t0
 	beq t0, zero, gameLoop
 	
-	beq a6,zero,AuxiliarEasyPick
+	j SmartDecision #for debugging
 	
+	li t0,2
+	beq a6,zero,AuxiliarEasyPick	# faz escolha randômica
+	beq a6,t0,SmartDecision	 	# faz a decisão inteligente
+				#para nível médio
+	li a7, 41		#guarda em a0 o numero pseudo aleatório gerado
+	ecall 	
+	remu t0,a0,t0	#t0 guarda paridade do número gerado
+	beq t0,zero,AuxiliarEasyPick
+	
+SmartDecision:	
 	addi sp, sp, -8
 	sw a0, 0(sp)
 	sw ra, 4(sp)
-	
 	
 	addi s11, s11, 1
 	li t0, 1
@@ -323,11 +333,9 @@ machineTurn:
 	jal checkCanAIWin		#checa se a IA pode vencer na próxima jogada
 	
 	jal blockPlayerWin
-	
-	lw a0, 0(sp)
-	lw ra, 4(sp)
-	addi sp, sp, 8
-
+KeepTurn:			#caso nã0 possa bloquear ou ganhar
+	addi s11,s11,-1
+	j AuxiliarEasyPick
 	ret
 
 retMachineTurn:
@@ -341,7 +349,6 @@ checkCanAIWin:
 	addi sp, sp, -4
 	sw ra, 0(sp)
 	
-	#mv t0, a6 #comentado para que a6=nível
 	jal checkAIPreviousPosition
 	
 	lw ra, 0(sp)
@@ -1098,7 +1105,7 @@ setOinBoard:
 	#jal restoreRegisterValues
 	
 	jal printOsymbol
-	j gameLoop
+	j AfterMachineTurn
 
 diagonalPosition0:
 	la t1, matriz
@@ -1111,7 +1118,7 @@ diagonalPosition0:
 	
 	li t6, 240
 	#jal restoreRegisterValues
-	bne t5, t6, gameLoop
+	bne t5, t6, KeepTurn
 
 diagonalPlotOPos0:
 	beq t3, zero, InDiagonalPos0insertPosition4
@@ -1140,7 +1147,7 @@ diagonalPosition4:
 	
 	li t6, 240
 	#jal restoreRegisterValues
-	bne t5, t6, gameLoop
+	bne t5, t6, KeepTurn
 
 diagonalPlotOPos4:
 	beq t2, zero, InDiagonalPos4insertPosition0
@@ -1169,7 +1176,7 @@ diagonalPosition8:
 	
 	li t6, 240
 	#jal restoreRegisterValues
-	bne t5, t6, gameLoop
+	bne t5, t6, KeepTurn
 
 diagonalPlotOPos8:
 	beq t2, zero, InDiagonalPos8insertPosition0
@@ -1198,7 +1205,7 @@ diagonalPosition2:
 	
 	li t6, 240
 	#jal restoreRegisterValues
-	bne t5, t6, gameLoop
+	bne t5, t6, KeepTurn
 
 diagonalPlotOPos2:
 	beq t3, zero, InDiagonalPos2insertPosition4
@@ -1228,7 +1235,7 @@ diagonalPosition6:
 	
 	li t6, 240
 	#jal restoreRegisterValues
-	bne t5, t6, gameLoop
+	bne t5, t6, KeepTurn
 
 diagonalPlotOPos6:
 	beq t2, zero, InDiagonalPos6insertPosition2
@@ -1324,7 +1331,7 @@ colummPosition3:
 	
 	li t6, 240
 	#jal restoreRegisterValues
-	bne t5, t6, gameLoop
+	bne t5, t6, KeepTurn
 
 colummPlotOPos3:
 	beq t2, zero, InColummPos3insertPosition0
@@ -1382,7 +1389,7 @@ colummPosition1:
 	
 	li t6, 240
 	#jal restoreRegisterValues
-	bne t5, t6, gameLoop
+	bne t5, t6, KeepTurn
 
 colummPlotOPos1:
 	beq t2, zero, InColummPos1insertPosition4
@@ -1440,7 +1447,7 @@ colummPosition7:
 	
 	li t6, 240
 	#jal restoreRegisterValues
-	bne t5, t6, gameLoop
+	bne t5, t6, KeepTurn
 
 colummPlotOPos7:
 	beq t2, zero, InColummPos7insertPosition1
@@ -1498,7 +1505,7 @@ colummPosition5:
 	
 	li t6, 240
 	#jal restoreRegisterValues
-	bne t5, t6, gameLoop
+	bne t5, t6, KeepTurn
 
 colummPlotOPos5:
 	beq t2, zero, InColummPos5insertPosition2
@@ -2595,4 +2602,4 @@ GetRandomSquare:	# recebe o endereço da matriz, retorna o conteúdo de um quadr
 	
 	lb a1,(a0)
 	ret			#a0 = endereco, a1= conteudo
-	#calcula ao +4t0
+	
